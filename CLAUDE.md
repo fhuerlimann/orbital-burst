@@ -119,12 +119,11 @@ Units: distances in Earth radii (RE = 6371 km) unless noted, time in seconds. Co
 **Hierarchy:**
 - **h1:** Archivo, stretch 72%, weight 800, `clamp(28px, 4.2vw, 44px)`, line-height 1. **Sentence case** ("One nuclear blast vs. 17,000 satellites"). The user rejected all caps and Frutiger.
 - **Subtitle** (`.top p`): Archivo 16px, 400, muted, max 72ch. The user rejected mono for it.
-- **Side-panel section headings** (`.ph`): Archivo, stretch 85%, 700, 11px, uppercase, 0.12em tracking, muted, with a top rule. Side-panel sections: Scenario, Status, Damage model. (The playback controls are in the bar under the scene, without a heading.)
+- **Block headings** (`.blk h2`): Archivo, stretch 80%, 700, 17px. (The old side panel and its small uppercase `.ph` headings are gone; `.ph` CSS remains but is unused.)
 - **Labels** (`.lab`, stat-tile labels, table headers, HUD labels, scene labels): Archivo 10.5px, 600, uppercase, 0.07–0.08em tracking, muted.
 - **Buttons:** Archivo 11px, 700, uppercase, 0.08em tracking. Primary (Detonate) uses the accent background.
 - **Large values:** IBM Plex Mono 21px, 500, tabular (stat tiles). HUD counters and clock: Plex Mono 26px (19px on phones).
 - **Small data** (slider values, table numbers, notes, histogram text): Plex Mono 11–12px, muted. Search input: Plex Mono with 0.1em tracking.
-- **Notes headings** (`.band h2`): Archivo, stretch 80%, 700, 17px.
 
 **Colours** (dark is the default; `:root[data-theme=light]` switches to light):
 - Dark: bg #0c1217, panel #131b22, text #e2e8ed, muted #8b99a5, lines #26323c, accent #ff8a4c, second series #6fb4ff
@@ -132,12 +131,12 @@ Units: distances in Earth radii (RE = 6371 km) unless noted, time in seconds. Co
 - **Approved exceptions:** the 3D stage is always dark (#05070b), including in light mode. Scene colours are independent of the theme: electrons and cloud **pink #ff4f8b**, healthy satellites **mint #8ff0c8**, failed satellites **red #ff4a3d** (histogram bars use the same mint and red). Flash kills in the HUD are warm white #fff4e0.
 
 **Layout and approved UI decisions:**
-- Header (h1 and subtitle), then the stage grid (3D scene, plus a 340px side panel on the right), then the histogram band, then the methods band.
+- **Single column, user-specified order:** header (h1 and subtitle), the full-width 3D scene, then the speed bar (`.pb`), then `<main class="blocks">` with one `.blk` section each, in this order: 1 Scenario (controls in an auto-fit grid), 2 Dose across the visible satellites (histogram), 3 Satellite groups (All/None, table, Find a satellite, catalogue note), 4 Damage model, 5 Status (tiles; electron period note), 6 What is physically modelled, and what isn't, 7 References (CelesTrak SATCAT satellite data first, then Petersen 2026, Stassinopoulos 2015, arXiv:1611.03390, DTRA 2001, three.js / ECharts credits), 8 MIT License (links to LICENSE and the repo). There is no side panel any more.
 - **Playback bar** (`.pb`, user request): directly under the 3D scene, inside the left column (`.left`). It has no heading and holds Simulation speed and the Field lines / Radiation belt / Satellites checkboxes (no Detonate or Pause buttons and no "Zoom out to GEO", user request; re-detonation happens via the mobile `.fab` or by changing a scenario control). "Radiation belt" (`#cl`, formerly "Density cloud") is checked by default; unchecking it hides the density cloud **and** all electron points. "Satellites" (`#sv`) is checked by default and toggles `satG`, the group holding the satellite points and the search highlight.
 - **HUD and clock have no background panels.** They use a text shadow only (user request).
 - **Colour legend** (`.legend`, bottom left of the scene, user request): "Satellite" mint #8ff0c8 and "Killed satellite" red #ff4a3d, stacked, label style with text shadow and no panel. (It used to be hidden and also listed trapped electrons.)
 - **The "South Atlantic Anomaly" scene label (`#lb2`) is hidden** (`style="display:none"`, and it is no longer positioned each frame); keep it in the DOM (user request).
-- Mobile (≤900px or coarse pointer): stacked layout, scene 58–62svh, `touch-action:none` on the scene, a floating Detonate button, pixel ratio ≤1.5, CK=12, dose steps ≤30 Hz. At ≤600px: 16px form text, 44px targets, smaller HUD, "of all…" line hidden.
+- Mobile (≤900px or coarse pointer): scene 58–62svh, `touch-action:none` on the scene, a floating Detonate button, pixel ratio ≤1.5, CK=12, dose steps ≤30 Hz. At ≤600px: 16px form text, 44px targets, smaller HUD, "of all…" line hidden.
 - The page's head `<style>` starts with the five-line design comment (VOICE / IDEA / PICTURE / COLOUR and TYPE / LAYOUT). Keep it updated.
 
 ---

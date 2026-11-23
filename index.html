@@ -11,7 +11,7 @@
    IDEA: a mission-control orbital display of a physics run
    PICTURE: the rotating Earth with a pink electron shell and satellite swarms
    COLOUR and TYPE: dark slate panels with an orange accent; Archivo for words (width axis sets hierarchy), IBM Plex Mono for every number
-   LAYOUT: big 3D stage left with the playback bar under it, instrument panel right, histogram and method notes below */
+   LAYOUT: full-width 3D stage with the speed bar under it, then one column of blocks: scenario, dose histogram, satellite groups, damage model, status, methods, references, licence */
 :root{color-scheme:dark;--bg:#0c1217;--panel:#131b22;--ink:#e2e8ed;--mut:#8b99a5;--line:#26323c;--acc:#ff8a4c;--acc2:#6fb4ff;--pink:#ff4f8b;--mint:#8ff0c8;--red:#ff4a3d;--ctl:#0c1217;
 --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;--f-body:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
 :root[data-theme=light]{color-scheme:light;--bg:#e9edf1;--panel:#f8fafb;--ink:#111b24;--mut:#56636f;--line:#cfd7df;--acc:#c2410c;--acc2:#1d5fa8;--red:#c81e1e;--ctl:#ffffff}
@@ -23,7 +23,7 @@ h1{font-family:var(--f-display);font-stretch:72%;font-weight:800;font-size:clamp
 .top p{margin:0;color:var(--mut);max-width:72ch;font:400 16px/1.5 var(--f-body);font-stretch:100%}
 .ph{font-family:var(--f-display);font-stretch:85%;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--mut);margin:6px 0 -4px;padding-top:10px;border-top:1px solid var(--line)}
 .ph:first-child{border-top:0;padding-top:0;margin-top:0}
-.stage{display:grid;grid-template-columns:minmax(0,1fr) 340px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stage{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .fig{position:relative;min-height:560px;height:72vh;background:#05070b;color:#e2e8ed}
 .fig canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
 .lbl{position:absolute;font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:#e2e8ed;background:rgba(5,7,11,.7);padding:3px 7px;border-radius:4px;pointer-events:none;white-space:nowrap;transform:translate(8px,-50%)}
@@ -39,10 +39,21 @@ h1{font-family:var(--f-display);font-stretch:72%;font-weight:800;font-size:clamp
 .legend{position:absolute;left:12px;bottom:12px;padding:8px 12px;font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:#c4ced6;display:flex;flex-direction:column;gap:5px;pointer-events:none;text-shadow:0 1px 3px #000,0 0 8px #000}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0}
 .left{display:flex;flex-direction:column}
-.pb{background:var(--panel);border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
+.pb{background:var(--panel);border-top:1px solid var(--line);padding-block:12px;padding-left:max(16px,3vw,env(safe-area-inset-left,0px));padding-right:max(16px,3vw,env(safe-area-inset-right,0px));display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
 .pbs{display:flex;align-items:center;gap:10px}.pbs .lab{flex:none}
 .pbc{display:flex;flex-wrap:wrap;gap:6px 16px}
-aside{background:var(--panel);border-left:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:12px}
+.blocks{display:flex;flex-direction:column}
+.blk{padding-block:22px 26px;padding-left:max(16px,3vw,env(safe-area-inset-left,0px));padding-right:max(16px,3vw,env(safe-area-inset-right,0px));border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px}
+.blk h2{font-family:var(--f-display);font-stretch:80%;font-weight:700;font-size:17px;margin:0}
+.blk .note{margin:0}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px 24px;max-width:1240px}
+.bh{display:flex;justify-content:space-between;align-items:center;gap:12px;max-width:640px}
+.gwrap{display:grid;grid-template-columns:minmax(0,640px) minmax(0,340px);gap:16px 40px;align-items:start}
+.gside{display:flex;flex-direction:column;gap:12px}
+.blk .stats{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));max-width:1240px}
+.prose ul{margin:0;padding-left:20px;max-width:1040px}.prose p{margin:0;max-width:80ch}
+.prose li{margin-bottom:7px;color:var(--ink);opacity:.88}.prose li b{font-weight:700;opacity:1}
+.prose a{color:var(--acc2)}.refs a{font-family:var(--f-mono);font-size:12px;word-break:break-word}
 .grp{display:flex;flex-direction:column;gap:6px}
 .lab{font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--mut);display:flex;justify-content:space-between;align-items:baseline}
 .lab b{font:500 12px var(--f-mono);font-variant-numeric:tabular-nums;color:var(--ink);text-transform:none;letter-spacing:0}
@@ -65,23 +76,20 @@ td label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}td input{mar
 td.n{text-align:right;font:12px var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:8px}
 input[type=search]{font:14px var(--f-mono);letter-spacing:.1em;color:var(--ink);background:var(--ctl);border:1px solid var(--line);border-radius:6px;min-height:40px;padding:0 10px;width:100%}
 .note{font:11.5px/1.55 var(--f-mono);color:var(--mut)}
-.band{padding:24px max(3vw,16px) 40px;max-width:1040px}
-.band h2{font-family:var(--f-display);font-stretch:80%;font-weight:700;font-size:17px;margin:0 0 10px}
-.band li{margin-bottom:7px;color:var(--ink);opacity:.88}.band li b{font-weight:700;opacity:1}
 #hs text{font-family:var(--f-mono)}
-@media(max-width:900px){.stage{grid-template-columns:1fr}aside{border-left:0;border-top:1px solid var(--line)}.fig{height:62vh;min-height:420px}}
+@media(max-width:900px){.fig{height:62vh;min-height:420px}.gwrap{grid-template-columns:minmax(0,1fr)}}
 .fab{display:none;position:absolute;right:12px;bottom:12px;background:var(--acc);border-color:var(--acc);color:#1a0d05;min-height:44px;padding:0 16px;box-shadow:0 2px 10px rgba(0,0,0,.5)}
 @media(max-width:900px){.fab{display:block}.fig{height:62svh;min-height:360px;touch-action:none}}
 @media(max-width:600px){
-.pb{padding:12px 14px}.pbs{flex-basis:100%}.pbs select{flex:1}
+.pbs{flex-basis:100%}.pbs select{flex:1}
 .top{padding:14px 14px 12px}.top p{font-size:15px}
 select,input[type=search]{font-size:16px}select,button{min-height:44px}
 .clock,.hud{top:6px;padding:6px 8px}.clock b,.hud b{font-size:19px}.hud{gap:2px 14px}.hud small{display:none}.legend{bottom:6px;left:6px;padding:6px 8px}.pie{width:40px;height:40px}.hud .pieW{margin-top:2px}
 .fig{height:58svh;min-height:330px}
-aside{padding:14px}.stats{gap:6px}.st div:last-child{font-size:18px}
+.blk{padding-block:18px 22px}.stats{gap:6px}.blk .stats{grid-template-columns:1fr 1fr}.st div:last-child{font-size:18px}
 .lbl{font-size:10px}
-#hist{height:220px!important}.band{padding:20px 14px 32px}
-.band ul{padding-left:18px}}
+#hist{height:220px!important}
+.prose ul{padding-left:18px}}
 @media(prefers-reduced-motion:reduce){.lbl{transition:none}}
 </style>
 </head>
@@ -110,8 +118,10 @@ aside{padding:14px}.stats{gap:6px}.st div:last-child{font-size:18px}
 <div class="pbc"><label class="chk"><input type="checkbox" id="fl"> Field lines</label><label class="chk"><input type="checkbox" id="cl" checked> Radiation belt</label><label class="chk"><input type="checkbox" id="sv" checked> Satellites</label></div>
 </div>
 </div>
-<aside>
-<h2 class="ph">Scenario</h2>
+</section>
+<main class="blocks">
+<section class="blk" aria-labelledby="hScen"><h2 id="hScen">Scenario</h2>
+<div class="cgrid">
 <div class="grp"><label class="lab" for="preset">Burst location</label>
 <select id="preset">
 <option value="16.7,-169.5,400">Johnston Island, 400 km (Starfish Prime site, 1962)</option>
@@ -125,7 +135,32 @@ aside{padding:14px}.stats{gap:6px}.st div:last-child{font-size:18px}
 <div class="grp"><div class="lab"><label for="alt">Altitude</label><b id="altO">400 km</b></div><input type="range" id="alt" min="100" max="2000" step="10" value="400"></div>
 <div class="grp"><div class="lab"><label for="lat">Latitude</label><b id="latO">16.7°</b></div><input type="range" id="lat" min="-60" max="60" step="0.1" value="16.7"></div>
 <div class="grp"><div class="lab"><label for="lon">Longitude</label><b id="lonO">−169.5°</b></div><input type="range" id="lon" min="-180" max="180" step="0.5" value="-169.5"></div>
-<h2 class="ph">Status</h2>
+</div>
+</section>
+<section class="blk" aria-labelledby="hDose"><h2 id="hDose">Dose across the visible satellites</h2>
+<p class="note" id="hN">–</p>
+<div id="hist" style="position:relative;height:260px"><svg id="hs" style="position:absolute;inset:0;width:100%;height:100%" role="img" aria-label="Histogram of accumulated dose per satellite with damage thresholds"></svg></div>
+</section>
+<section class="blk" aria-labelledby="hGrp"><div class="bh"><h2 id="hGrp">Satellite groups</h2><span style="flex:none;display:flex;gap:6px"><button id="gAll" style="min-height:32px">All</button><button id="gNone" style="min-height:32px">None</button></span></div>
+<div class="gwrap">
+<table id="gt"><thead><tr><td>Group</td><td class="n">Active</td><td class="n">Past limit</td></tr></thead><tbody id="gtb"></tbody></table>
+<div class="gside">
+<div class="grp"><label class="lab" for="q">Find a satellite</label><input id="q" type="search" placeholder="ISS (ZARYA)" autocomplete="off"><div id="qO" class="note"></div></div>
+<p class="note" id="src">Loading satellite catalogue…</p>
+</div>
+</div>
+</section>
+<section class="blk" aria-labelledby="hDmg"><h2 id="hDmg">Damage model</h2>
+<div class="cgrid">
+<div class="grp"><label class="lab" for="thrS">Total‑dose failure threshold</label>
+<select id="thrS"><option value="10">10 krad(Si): sensitive commercial parts</option><option value="40" selected>40 krad(Si): civilian‑weighted fleet</option><option value="120">120 krad(Si): hardened blend</option><option value="300">300 krad(Si): radiation‑hardened</option></select></div>
+<div class="grp"><label class="lab" for="srcS">Electron source</label>
+<select id="srcS"><option value="low">Low: 0.40 electrons/fission, first 2 s</option><option value="central" selected>Central: 1.29 electrons/fission, first 20 s</option><option value="high">High: 5.21 electrons/fission, over 6 months</option></select></div>
+<div class="grp"><label class="lab" for="calS">Dose model</label>
+<select id="calS"><option value="0.15" selected>Calibrated to Petersen et al. 2026</option><option value="1">Field‑line model (matches Telstar 1962)</option></select></div>
+</div>
+</section>
+<section class="blk" aria-labelledby="hSt"><h2 id="hSt">Status</h2>
 <div class="stats">
 <div class="st wide"><div>Time since burst</div><div id="tO">0 s</div></div>
 <div class="st"><div>Still trapped</div><div id="trO">–</div></div>
@@ -137,27 +172,9 @@ aside{padding:14px}.stats{gap:6px}.st div:last-child{font-size:18px}
 <div class="st"><div>ISS dose</div><div id="s3O">0</div></div>
 <div class="st"><div>Tiangong dose</div><div id="s4O">0</div></div>
 </div>
-<h2 class="ph">Damage model</h2>
-<div class="grp"><label class="lab" for="thrS">Total‑dose failure threshold</label>
-<select id="thrS"><option value="10">10 krad(Si): sensitive commercial parts</option><option value="40" selected>40 krad(Si): civilian‑weighted fleet</option><option value="120">120 krad(Si): hardened blend</option><option value="300">300 krad(Si): radiation‑hardened</option></select></div>
-<div class="grp"><label class="lab" for="srcS">Electron source</label>
-<select id="srcS"><option value="low">Low: 0.40 electrons/fission, first 2 s</option><option value="central" selected>Central: 1.29 electrons/fission, first 20 s</option><option value="high">High: 5.21 electrons/fission, over 6 months</option></select></div>
-<div class="grp"><label class="lab" for="calS">Dose model</label>
-<select id="calS"><option value="0.15" selected>Calibrated to Petersen et al. 2026</option><option value="1">Field‑line model (matches Telstar 1962)</option></select></div>
-<div class="row" style="justify-content:space-between;align-items:center"><span class="lab" style="flex:none">Satellite groups</span><span style="flex:none;display:flex;gap:6px"><button id="gAll" style="min-height:32px">All</button><button id="gNone" style="min-height:32px">None</button></span></div>
-<table id="gt"><thead><tr><td>Group</td><td class="n">Active</td><td class="n">Past limit</td></tr></thead><tbody id="gtb"></tbody></table>
-<div class="grp"><label class="lab" for="q">Find a satellite</label><input id="q" type="search" placeholder="ISS (ZARYA)" autocomplete="off"><div id="qO" class="note"></div></div>
 <p class="note" id="per">–</p>
-<p class="note" id="src">Loading satellite catalogue…</p>
-</aside>
 </section>
-<section class="band" style="max-width:none;padding-bottom:8px">
-<h2>Dose across the visible satellites</h2>
-<p class="note" id="hN" style="margin:0 0 8px">–</p>
-<div id="hist" style="position:relative;height:260px"><svg id="hs" style="position:absolute;inset:0;width:100%;height:100%" role="img" aria-label="Histogram of accumulated dose per satellite with damage thresholds"></svg></div>
-</section>
-<section class="band">
-<h2>What is physically modelled, and what isn’t</h2>
+<section class="blk prose" aria-labelledby="hMeth"><h2 id="hMeth">What is physically modelled, and what isn’t</h2>
 <ul>
 <li><b>Accurate:</b> the geomagnetic field is an eccentric, tilted dipole. The pole is at 80.8°N, 72.6°W and the centre is offset about 570 km toward the western Pacific, which is what creates the South Atlantic Anomaly. Earth rotates at its sidereal rate, and the satellites fly circular Keplerian orbits.</li>
 <li><b>Accurate:</b> electrons come from the fission beta spectrum (Carter fit) and are emitted isotropically. Their L‑shells, equatorial pitch angles and mirror latitudes are computed from conservation of the first adiabatic invariant. Drift rates use the relativistic guiding‑centre formula with Hamlin’s pitch‑angle correction, so drift periods are real: about an hour for 1 MeV at L≈1.2.</li>
@@ -174,6 +191,20 @@ aside{padding:14px}.stats{gap:6px}.st div:last-child{font-size:18px}
 <li><b>The burst’s appearance</b> follows what was seen and photographed in 1962. First there’s a white X‑ray and visible flash that lights up the view and the Earth below. Then a debris shell expands and cools from white to orange to red, and is drawn out along the magnetic field. X‑rays absorbed around 90 km heat a broad red patch of upper atmosphere beneath the burst. Debris and beta electrons stream down the field line through the burst and light up aurora at both of its ends, as at Samoa, about 3,000 km to the south, after Starfish. These effects play in wall‑clock time (about 90 s), whatever the speed setting. Sizes grow with the cube root of yield. For the first second a pale sphere shows the flash damage radius, then fades out, since the flash only does damage at the instant of the burst.</li>
 </ul>
 </section>
+<section class="blk prose" aria-labelledby="hRef"><h2 id="hRef">References</h2>
+<ul class="refs">
+<li><b>Satellite data:</b> CelesTrak SATCAT, the satellite catalogue maintained by T.S. Kelso. Export of 20 Nov 2026: the 17,405 active, Earth‑orbiting payloads with their perigee, apogee and inclination. <a href="https://celestrak.org/satcat/" target="_blank" rel="noopener">celestrak.org/satcat</a></li>
+<li>Petersen, Qin, Thiele &amp; Philippe (2026), <i>Effects of a Nuclear Detonation in Low Earth Orbit</i>, arXiv:2611.09827. Source cases, the 40 and 120 krad thresholds, the 40 J/m² flash criterion and the benchmark the dose model is calibrated to. <a href="https://arxiv.org/abs/2611.09827" target="_blank" rel="noopener">arxiv.org/abs/2611.09827</a></li>
+<li>E. G. Stassinopoulos (2015), <i>The STARFISH Exo‑atmospheric, High‑altitude Nuclear Weapons Test</i>, NASA Goddard. Starfish Prime yield, altitude and the satellites it disabled. <a href="https://ntrs.nasa.gov/citations/20150018896" target="_blank" rel="noopener">NASA NTRS 20150018896</a></li>
+<li><i>Anthropogenic Space Weather</i>, arXiv:1611.03390. Telstar 1 electron flux measured after Starfish, used to check the field‑line model. <a href="https://arxiv.org/abs/1611.03390" target="_blank" rel="noopener">arxiv.org/abs/1611.03390</a></li>
+<li>Defense Threat Reduction Agency (2001), <i>High Altitude Nuclear Detonations (HAND) Against Low Earth Orbit Satellites</i>.</li>
+<li>Software: <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> r128 (MIT) for the 3D scene; the world map outline from <a href="https://echarts.apache.org" target="_blank" rel="noopener">Apache ECharts</a> 4.9 (Apache 2.0).</li>
+</ul>
+</section>
+<section class="blk prose" aria-labelledby="hLic"><h2 id="hLic">MIT License</h2>
+<p>The code of this simulation is released under the <a href="https://github.com/fhuerlimann/orbital-burst/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>, © 2026 Florian Huerlimann. You may use, copy, modify and share it, as long as the copyright notice stays with it. It comes without any warranty. The satellite data comes from CelesTrak and is not covered by this licence. Source code: <a href="https://github.com/fhuerlimann/orbital-burst" target="_blank" rel="noopener">github.com/fhuerlimann/orbital-burst</a></p>
+</section>
+</main>
 <script>window.echarts={registerMap:function(n,g){window.WORLD=g;}};</script>
 <script src="https://cdn.jsdelivr.net/npm/echarts@4.9.0/map/js/world.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
