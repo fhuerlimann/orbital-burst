@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>One nuclear blast vs. 17,000 satellites</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* VOICE: engineering instrument, precise and quiet
+   IDEA: a mission-control orbital display of a physics run
+   PICTURE: the rotating Earth with a pink electron shell and satellite swarms
+   COLOUR and TYPE: dark slate panels with an orange accent; Archivo for words (width axis sets hierarchy), IBM Plex Mono for every number
+   LAYOUT: big 3D stage left, instrument panel right, histogram and method notes below */
+:root{color-scheme:dark;--bg:#0c1217;--panel:#131b22;--ink:#e2e8ed;--mut:#8b99a5;--line:#26323c;--acc:#ff8a4c;--acc2:#6fb4ff;--pink:#ff4f8b;--mint:#8ff0c8;--red:#ff4a3d;--ctl:#0c1217;
+--f-display:"Archivo","Helvetica Neue",Arial,sans-serif;--f-body:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+:root[data-theme=light]{color-scheme:light;--bg:#e9edf1;--panel:#f8fafb;--ink:#111b24;--mut:#56636f;--line:#cfd7df;--acc:#c2410c;--acc2:#1d5fa8;--red:#c81e1e;--ctl:#ffffff}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--f-body);font-stretch:100%;overflow-x:clip}
+.mono,.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+h1{font-family:var(--f-display);font-stretch:72%;font-weight:800;font-size:clamp(28px,4.2vw,44px);line-height:1;margin:0 0 10px;text-wrap:balance}
+.top{padding:22px max(3vw,16px) 16px}
+.top p{margin:0;color:var(--mut);max-width:72ch;font:400 16px/1.5 var(--f-body);font-stretch:100%}
+.ph{font-family:var(--f-display);font-stretch:85%;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--mut);margin:6px 0 -4px;padding-top:10px;border-top:1px solid var(--line)}
+.ph:first-child{border-top:0;padding-top:0;margin-top:0}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 340px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.fig{position:relative;min-height:560px;height:72vh;background:#05070b;color:#e2e8ed}
+.fig canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+.lbl{position:absolute;font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:#e2e8ed;background:rgba(5,7,11,.7);padding:3px 7px;border-radius:4px;pointer-events:none;white-space:nowrap;transform:translate(8px,-50%)}
+.clock,.hud{position:absolute;top:12px;text-shadow:0 1px 3px #000,0 0 8px #000;padding:8px 12px;pointer-events:none}
+.clock{right:12px;text-align:right;display:flex;flex-direction:column}
+.hud{left:12px;display:flex;flex-wrap:wrap;gap:4px 22px;align-items:flex-end}.hud div{display:flex;flex-direction:column}
+.clock span,.hud span{font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:#8b99a5}
+.clock b,.hud b{font:500 26px/1.15 var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+#hudF{color:#fff4e0}#hudB{color:#ff4a3d}.hud small{flex-basis:100%;font:11px var(--f-mono);color:#8b99a5}
+.legend{position:absolute;left:12px;bottom:12px;font-size:12px;color:#8b99a5;display:flex;gap:14px;flex-wrap:wrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0}
+aside{background:var(--panel);border-left:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:12px}
+.grp{display:flex;flex-direction:column;gap:6px}
+.lab{font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--mut);display:flex;justify-content:space-between;align-items:baseline}
+.lab b{font:500 12px var(--f-mono);font-variant-numeric:tabular-nums;color:var(--ink);text-transform:none;letter-spacing:0}
+select,button{font:14px var(--f-body);color:var(--ink);background:var(--ctl);border:1px solid var(--line);border-radius:6px;min-height:40px;padding:0 10px}
+button{cursor:pointer;font:700 11px var(--f-body);text-transform:uppercase;letter-spacing:.08em}button:hover,select:hover{border-color:var(--mut)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.row>*{flex:1}
+.go{background:var(--acc);border-color:var(--acc);color:#1a0d05}
+:root[data-theme=light] .go{color:#fff}
+input[type=range]{width:100%;accent-color:var(--acc);height:24px}
+.chk{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--mut)}.chk input{accent-color:var(--acc)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.st{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.st div:first-child{font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--mut)}
+.st div:last-child{font:500 21px/1.25 var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.wide{grid-column:1/-1}
+table{width:100%;border-collapse:collapse;font-size:13px}td{padding:5px 0;border-bottom:1px solid var(--line)}
+thead td{font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--mut)}
+td label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}td input{margin:2px 0 0;accent-color:var(--acc);width:16px;height:16px;flex:none}tr.off td{color:var(--mut);opacity:.6}
+td.n{text-align:right;font:12px var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:8px}
+input[type=search]{font:14px var(--f-mono);letter-spacing:.1em;color:var(--ink);background:var(--ctl);border:1px solid var(--line);border-radius:6px;min-height:40px;padding:0 10px;width:100%}
+.note{font:11.5px/1.55 var(--f-mono);color:var(--mut)}
+.band{padding:24px max(3vw,16px) 40px;max-width:1040px}
+.band h2{font-family:var(--f-display);font-stretch:80%;font-weight:700;font-size:17px;margin:0 0 10px}
+.band li{margin-bottom:7px;color:var(--ink);opacity:.88}.band li b{font-weight:700;opacity:1}
+#hs text{font-family:var(--f-mono)}
+@media(max-width:900px){.stage{grid-template-columns:1fr}aside{border-left:0;border-top:1px solid var(--line)}.fig{height:62vh;min-height:420px}}
+.fab{display:none;position:absolute;right:12px;bottom:12px;background:var(--acc);border-color:var(--acc);color:#1a0d05;min-height:44px;padding:0 16px;box-shadow:0 2px 10px rgba(0,0,0,.5)}
+@media(max-width:900px){.fab{display:block}.fig{height:62svh;min-height:360px;touch-action:none}}
+@media(max-width:600px){
+.top{padding:14px 14px 12px}.top p{font-size:15px}
+select,input[type=search]{font-size:16px}select,button{min-height:44px}
+.clock,.hud{top:6px;padding:6px 8px}.clock b,.hud b{font-size:19px}.hud{gap:2px 14px}.hud small{display:none}
+.fig{height:58svh;min-height:330px}
+aside{padding:14px}.stats{gap:6px}.st div:last-child{font-size:18px}
+.lbl{font-size:10px}
+#hist{height:220px!important}.band{padding:20px 14px 32px}
+.band ul{padding-left:18px}}
+@media(prefers-reduced-motion:reduce){.lbl{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+<h1>One nuclear blast vs. 17,000 satellites</h1>
+<p>A nuclear explosion in space traps its electrons in Earth’s magnetic field, forming an artificial radiation belt that wraps the planet within an hour and destroys satellites for months. Pick a site and yield, then watch it happen with the real catalogue of 17,405 active satellites.</p>
+</header>
+<section class="stage">
+<div class="fig" id="fig">
+<canvas id="cv" aria-label="3D view of Earth, magnetic field lines, trapped electrons and satellite orbits"></canvas>
+<div id="bflash" style="position:absolute;inset:0;pointer-events:none;opacity:0"></div>
+<button class="fab" id="go2" aria-label="Detonate again">Detonate</button>
+<div class="lbl" id="lb1">Burst</div>
+<div class="lbl" id="lb2">South Atlantic Anomaly</div>
+<div class="clock"><span>Time since burst</span><b id="clk">T+ 00:00:00</b></div>
+<div class="hud" aria-live="polite"><div><span>Flash kills</span><b id="hudF">0</b></div><div><span>Belt kills</span><b id="hudB">0</b></div><small id="hudT">of all active satellites</small></div>
+<div class="legend" style="display:none"><span><i class="dot" style="background:var(--pink)"></i>Trapped electrons</span><span><i class="dot" style="background:var(--mint)"></i>Satellite, healthy</span><span><i class="dot" style="background:var(--red)"></i>Past damage threshold</span></div>
+</div>
+<aside>
+<h2 class="ph">Scenario</h2>
+<div class="grp"><label class="lab" for="preset">Burst location</label>
+<select id="preset">
+<option value="16.7,-169.5,400">Johnston Island, 400 km (Starfish Prime site, 1962)</option>
+<option value="47.0,67.0,290">Kazakhstan, 290 km (Soviet test K‑3 site, 1962)</option>
+<option value="0,-30,400">Equator, mid‑Atlantic, 400 km</option>
+<option value="-26,-50,400">South Atlantic Anomaly, 400 km</option>
+<option value="custom">Custom</option>
+</select></div>
+<div class="grp"><label class="lab" for="yld">Yield</label>
+<select id="yld"><option value="0.01">10 kilotons</option><option value="0.1">100 kilotons</option><option value="1">1 megaton</option><option value="1.4" selected>1.4 megatons (Starfish Prime)</option><option value="10">10 megatons</option></select></div>
+<div class="grp"><div class="lab"><label for="alt">Altitude</label><b id="altO">400 km</b></div><input type="range" id="alt" min="100" max="2000" step="10" value="400"></div>
+<div class="grp"><div class="lab"><label for="lat">Latitude</label><b id="latO">16.7°</b></div><input type="range" id="lat" min="-60" max="60" step="0.1" value="16.7"></div>
+<div class="grp"><div class="lab"><label for="lon">Longitude</label><b id="lonO">−169.5°</b></div><input type="range" id="lon" min="-180" max="180" step="0.5" value="-169.5"></div>
+<h2 class="ph">Playback</h2>
+<div class="row"><button class="go" id="go">Detonate</button><button id="pp">Pause</button></div>
+<div class="grp"><label class="lab" for="warp">Simulation speed</label>
+<select id="warp">
+<option value="1">Real time</option><option value="60" selected>1 minute per second</option><option value="600">10 minutes per second</option><option value="3600">1 hour per second</option><option value="86400">1 day per second</option><option value="604800">1 week per second</option><option value="2629800">1 month per second</option>
+</select></div>
+<div class="row"><label class="chk"><input type="checkbox" id="fl"> Field lines</label><label class="chk"><input type="checkbox" id="cl" checked> Density cloud</label><label class="chk"><input type="checkbox" id="gps"> Zoom out to GEO</label></div>
+<h2 class="ph">Status</h2>
+<div class="stats">
+<div class="st wide"><div>Time since burst</div><div id="tO">0 s</div></div>
+<div class="st"><div>Still trapped</div><div id="trO">–</div></div>
+<div class="st"><div>Killed by the flash</div><div id="pkO">0</div></div>
+<div class="st"><div>Flash damage radius</div><div id="prO">–</div></div>
+<div class="st"><div>Lost at once</div><div id="l1O">–</div></div>
+<div class="st"><div>Lost over SAA / atmosphere</div><div id="l2O">–</div></div>
+<div class="st"><div>Belt core L‑shell</div><div id="LO">–</div></div>
+<div class="st"><div>ISS dose</div><div id="s3O">0</div></div>
+<div class="st"><div>Tiangong dose</div><div id="s4O">0</div></div>
+</div>
+<h2 class="ph">Damage model</h2>
+<div class="grp"><label class="lab" for="thrS">Total‑dose failure threshold</label>
+<select id="thrS"><option value="10">10 krad(Si): sensitive commercial parts</option><option value="40" selected>40 krad(Si): civilian‑weighted fleet</option><option value="120">120 krad(Si): hardened blend</option><option value="300">300 krad(Si): radiation‑hardened</option></select></div>
+<div class="grp"><label class="lab" for="srcS">Electron source</label>
+<select id="srcS"><option value="low">Low: 0.40 electrons/fission, first 2 s</option><option value="central" selected>Central: 1.29 electrons/fission, first 20 s</option><option value="high">High: 5.21 electrons/fission, over 6 months</option></select></div>
+<div class="grp"><label class="lab" for="calS">Dose model</label>
+<select id="calS"><option value="0.15" selected>Calibrated to Petersen et al. 2026</option><option value="1">Field‑line model (matches Telstar 1962)</option></select></div>
+<div class="row" style="justify-content:space-between;align-items:center"><span class="lab" style="flex:none">Satellite groups</span><span style="flex:none;display:flex;gap:6px"><button id="gAll" style="min-height:32px">All</button><button id="gNone" style="min-height:32px">None</button></span></div>
+<table id="gt"><thead><tr><td>Group</td><td class="n">Active</td><td class="n">Past limit</td></tr></thead><tbody id="gtb"></tbody></table>
+<div class="grp"><label class="lab" for="q">Find a satellite</label><input id="q" type="search" placeholder="ISS (ZARYA)" autocomplete="off"><div id="qO" class="note"></div></div>
+<p class="note" id="per">–</p>
+<p class="note" id="src">Loading satellite catalogue…</p>
+</aside>
+</section>
+<section class="band" style="max-width:none;padding-bottom:8px">
+<h2>Dose across the visible satellites</h2>
+<p class="note" id="hN" style="margin:0 0 8px">–</p>
+<div id="hist" style="position:relative;height:260px"><svg id="hs" style="position:absolute;inset:0;width:100%;height:100%" role="img" aria-label="Histogram of accumulated dose per satellite with damage thresholds"></svg></div>
+</section>
+<section class="band">
+<h2>What is physically modelled, and what isn’t</h2>
+<ul>
+<li><b>Accurate:</b> the geomagnetic field is an eccentric, tilted dipole. The pole is at 80.8°N, 72.6°W and the centre is offset about 570 km toward the western Pacific, which is what creates the South Atlantic Anomaly. Earth rotates at its sidereal rate, and the satellites fly circular Keplerian orbits.</li>
+<li><b>Accurate:</b> electrons come from the fission beta spectrum (Carter fit) and are emitted isotropically. Their L‑shells, equatorial pitch angles and mirror latitudes are computed from conservation of the first adiabatic invariant. Drift rates use the relativistic guiding‑centre formula with Hamlin’s pitch‑angle correction, so drift periods are real: about an hour for 1 MeV at L≈1.2.</li>
+<li><b>Accurate:</b> loss cones. Electrons that mirror below 100 km anywhere on their drift path are lost, either in their first bounce or when they drift over the SAA, where the field dips closest to Earth.</li>
+<li><b>Approximate:</b> slow decay from atmospheric scattering. The lifetime grows exponentially with the electrons’ lowest mirror altitude (about 1 day at 150 km, months at 500 km, capped at 5 years), roughly matching how the Starfish belt decayed.</li>
+<li><b>Simplified:</b> the debris cloud is a random spread of about 400 km horizontally, plus an upward rise of around 600 km (up to 4,000 km). That reproduces the L≈1.1–2 spread measured after Starfish, which a compact cloud at 400 km would not: its field lines dip into the atmosphere over the SAA. All electrons are injected at t = 0, although real debris keeps decaying for hours. Bounce motion is drawn slowed down, since real bounces take about 0.1 s. There are no solar storms or external field.</li>
+<li><b>Real satellites:</b> all 17,405 active, Earth‑orbiting satellites in CelesTrak’s catalogue of 20 Nov 2026, each with its true perigee, apogee and inclination, flown as a Kepler orbit with J2 precession of the node and perigee. The catalogue does not give positions along the orbit, so starting node and phase are random. Over the days to months that matter for dose this barely changes the result: the belt surrounds Earth within hours, and orbits precess through every longitude.</li>
+<li><b>Electron inventory:</b> 1.45×10²³ fissions per kiloton, assuming 50% of the yield comes from fission, times 0.40, 1.29 or 5.21 beta electrons per fission. Those are the low, central and high source cases of Petersen et al. (2026), with electrons released over the first 2 s, 20 s or six months. Late electrons are injected where the debris was at the burst; in reality the debris has spread out by then. Each simulated electron stands for about 10²² real ones.</li>
+<li><b>Dose:</b> each electron’s density along its field line, times its speed, gives the omnidirectional flux at each satellite. This is converted to dose in silicon behind 2 mm of aluminium. Electrons below about 0.9 MeV are stopped; above that, they deposit about 1.7 MeV·cm²/g. Bremsstrahlung, protons, the natural belts and solar cell damage are left out.</li>
+<li><b>Validation:</b> for Starfish, this field‑line model gives an average flux of about 4.5×10¹² electrons/cm² per day above 0.5 MeV along Telstar 1’s orbit over its first 200 days. Telstar measured about 6×10¹². The Princeton model spreads electrons over the whole magnetic shell and gives roughly 7× less dose in low orbit. Both are simplifications of the same physics, so the page offers both. The default scales dose by 0.15, which reproduces that study’s 1 Mt, 500 km South Atlantic benchmark: 2.7% killed in the flash (paper: 2.9%), 17% / 95% / 100% failed at 40 krad by days 1 / 3 / 7 (paper: about 25 / 78 / 98%), and 70% at 120 krad by day 7 (paper: about 72%).</li>
+<li><b>Known gap at low yield:</b> here the belt loses its low‑mirroring electrons, the ones that hit low orbits, faster than in the Princeton model, which includes radial diffusion and electron lifetimes of up to eight years. At 100 kt this page fails about 40% of low‑orbit satellites within a month at 40 krad, where the paper finds about 90%. At 10 kt it fails about 16% within a year, against the paper’s 92%. Read low‑yield results as a lower bound.</li>
+<li><b>Thresholds:</b> real tolerance varies enormously and isn’t published for most satellites. The presets are 10 krad (sensitive commercial parts), 40 and 120 krad (the civilian‑weighted and hardened blends used by Petersen et al.) and 300 krad (radiation‑hardened). The flash kills a satellite in line of sight if its X‑ray fluence exceeds 40 J/m², scaled up for thresholds above 40 krad, assuming 70% of the yield is emitted as X‑rays.</li>
+<li><b>Density cloud:</b> each simulated electron stands for about 10²² real ones with a spread of energies. It’s drawn as 24 soft blobs spread through its bounce phase, across about ±0.01 in L, and in drift longitude by ±50% of its drift rate times its age. That’s how far real electrons in such a bundle would have spread, so the cloud starts compact and wraps into a smooth shell over a few drift periods. Where blobs pile up and glow brighter, the electron density is higher.</li>
+<li><b>The burst’s appearance</b> follows what was seen and photographed in 1962. First there’s a white X‑ray and visible flash that lights up the view and the Earth below. Then a debris shell expands and cools from white to orange to red, and is drawn out along the magnetic field. X‑rays absorbed around 90 km heat a broad red patch of upper atmosphere beneath the burst. Debris and beta electrons stream down the field line through the burst and light up aurora at both of its ends, as at Samoa, about 3,000 km to the south, after Starfish. These effects play in wall‑clock time (about 90 s), whatever the speed setting. Sizes grow with the cube root of yield. For the first second a pale sphere shows the flash damage radius, then fades out, since the flash only does damage at the instant of the burst.</li>
+</ul>
+</section>
+<script>window.echarts={registerMap:function(n,g){window.WORLD=g;}};</script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@4.9.0/map/js/world.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+//PHYS-START
+var PHYS=(function(){
+const RE=6371e3,RE_KM=6371,C=2.998e8,ME=9.109e-31,Q=1.602e-19,B0=3.0e-5,MC2=0.511,OMEGA_E=7.2921e-5,MU=3.986e14,D2R=Math.PI/180,TAU=2*Math.PI;
+const geo=(lat,lon,r)=>{lat*=D2R;lon*=D2R;return[r*Math.cos(lat)*Math.cos(lon),r*Math.sin(lat),-r*Math.cos(lat)*Math.sin(lon)];};
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const add=(a,b)=>[a[0]+b[0],a[1]+b[1],a[2]+b[2]];
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+const scl=(a,s)=>[a[0]*s,a[1]*s,a[2]*s];
+const len=a=>Math.hypot(a[0],a[1],a[2]);
+const norm=a=>scl(a,1/len(a));
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const U=geo(80.8,-72.6,1);
+const ref=[1,0,0];
+const A=norm(sub(ref,scl(U,dot(ref,U))));
+const Zm=cross(A,U);
+const O=geo(22,142,570/RE_KM);
+const toLocal=p=>{const d=sub(p,O);return[dot(d,A),dot(d,U),dot(d,Zm)];};
+const toFixed=l=>add(O,add(add(scl(A,l[0]),scl(U,l[1])),scl(Zm,l[2])));
+const magPoint=(r,lam,phi)=>[r*Math.cos(lam)*Math.cos(phi),r*Math.sin(lam),-r*Math.cos(lam)*Math.sin(phi)];
+const Brat=l=>{const s=Math.sin(l),c=Math.cos(l);return Math.sqrt(1+3*s*s)/Math.pow(c,6);};
+function mirrorLat(s2){if(s2>=1)return 0;if(s2<=1e-9)return 1.55;const tg=1/s2;let lo=0,hi=1.55;for(let i=0;i<50;i++){const m=(lo+hi)/2;if(Brat(m)<tg)lo=m;else hi=m;}return lo;}
+function periods(L,E,y){const g=1+E/MC2,v=C*Math.sqrt(1-1/(g*g));const Tb=4*L*RE/v*(1.3802-0.3198*(y+Math.sqrt(y)));const wd=3*L*g*ME*v*v*(0.35+0.15*y)/(Q*B0*RE*RE);return{Tb,wd};}
+function sampleE(){for(;;){const E=0.05+Math.random()*7;if(Math.random()<Math.exp(-0.575*E-0.055*E*E))return E;}}
+const gauss=()=>Math.sqrt(-2*Math.log(Math.random()+1e-12))*Math.cos(TAU*Math.random());
+const NPHI=72;
+const SRC={low:{pf:0.40},central:{pf:1.29},high:{pf:5.21}};
+const logU=(a,b)=>Math.exp(Math.log(a)+Math.random()*(Math.log(b)-Math.log(a)));
+const RE_CM=RE*100,FISS_PER_KT=1.45e23;
+function pathLen(L,lm){let s=0;const n=40;for(let i=0;i<n;i++){const l=(i+0.5)/n*lm;const sl=Math.sin(l);s+=Math.cos(l)*Math.sqrt(1+3*sl*sl);}return 2*L*RE_CM*s*lm/n;}
+const doseFac=E=>2.72e-8*Math.max(0,Math.min(1,(E-0.9)/1.0));
+function makeParticles(N,lat,lon,altKm,Ymt,src){Ymt=Ymt||1.4;src=SRC[src]?src:'central';
+const w=Ymt*1000*FISS_PER_KT*0.5*SRC[src].pf/N;
+const P=[];const bp=geo(lat,lon,1+altKm/RE_KM);const up=norm(bp);
+for(let i=0;i<N;i++){
+const dir=norm([gauss(),gauss(),gauss()]);
+const p=add(add(bp,scl(dir,Math.abs(gauss())*400/RE_KM)),scl(up,Math.min(4000,-600*Math.log(Math.random()+1e-12))/RE_KM));
+const l=toLocal(p);const r=len(l);const lam=Math.asin(l[1]/r);const phi0=Math.atan2(-l[2],l[0]);
+const L=r/Math.pow(Math.cos(lam),2);
+const ca=2*Math.random()-1;const s2eq=Math.min(1,(1-ca*ca)/Brat(lam));
+const lm=Math.max(Math.abs(lam),mirrorLat(s2eq));const y=Math.sqrt(s2eq);
+const E=sampleE();const pr=periods(L,E,y);
+const rm=L*Math.pow(Math.cos(lm),2);
+let hmin=1e9,death=Infinity,kind=0;
+for(let k=0;k<NPHI;k++){const ph=phi0+k*TAU/NPHI;
+const hN=(len(toFixed(magPoint(rm,lm,ph)))-1)*RE_KM,hS=(len(toFixed(magPoint(rm,-lm,ph)))-1)*RE_KM;const h=Math.min(hN,hS);
+if(h<hmin)hmin=h;
+if(h<100&&death===Infinity){if(k===0){death=pr.Tb;kind=1;}else{death=k*TAU/NPHI/pr.wd;kind=2;}}}
+if(kind===0){const tau=Math.min(5*3.156e7,86400*Math.exp((hmin-150)/70));death=-tau*Math.log(Math.random()+1e-12);}
+const tb=src==='low'?logU(0.1,2):src==='central'?logU(0.1,20):(Math.random()<1.29/5.21?logU(0.1,20):logU(20,1.58e7));
+const g=1+E/MC2,vcm=C*100*Math.sqrt(1-1/(g*g));
+P.push({L,lm,phi0,wd:pr.wd,Tb:pr.Tb,E,death,kind,hmin,tb,k:w*vcm*doseFac(E)/pathLen(L,lm),ph:Math.random()*TAU,vb:1.6+Math.random()*1.6});}
+return P;}
+const J2=1.08263e-3;
+function satFromOrbit(o){const rp=(RE_KM+o.per)*1e3,ra=(RE_KM+Math.max(o.per,o.apo))*1e3,a=(rp+ra)/2,e=(ra-rp)/(ra+rp),inc=o.inc*D2R,n=Math.sqrt(MU/(a*a*a)),p=a*(1-e*e),k=1.5*n*J2*Math.pow(RE/p,2);
+return Object.assign(o,{a,r:a/RE,e,inc,n,raan:o.raan!=null?o.raan:Math.random()*TAU,argp:o.argp!=null?o.argp:Math.random()*TAU,M0:o.M0!=null?o.M0:Math.random()*TAU,dRaan:-k*Math.cos(inc),dArgp:0.5*k*(5*Math.pow(Math.cos(inc),2)-1),dose:0});}
+function makeSats(){const S=[];
+const shell=(g,alt,inc,planes,per,f)=>{for(let p=0;p<planes;p++)for(let s=0;s<per;s++)S.push(satFromOrbit({name:g+' '+(S.length+1),g,per:alt,apo:alt,inc,raan:TAU*p/planes,argp:0,M0:TAU*s/per+TAU*p*f/(planes*per)}));};
+shell('Starlink',550,53,24,9,1);shell('Other LEO',560,97.6,12,6,1);shell('Navigation (GPS, GLONASS, Galileo, BeiDou)',20200,55,6,4,1);return S;}
+function makeSatsFromData(rows){return rows.map(r=>satFromOrbit({name:r[0],id:r[1],own:r[2],g:r[3],per:r[4],apo:r[5],inc:r[6]}));}
+function satPos(s,t){const M=s.M0+s.n*t;let E=M;for(let i=0;i<(s.e>0.1?10:3);i++)E-=(E-s.e*Math.sin(E)-M)/(1-s.e*Math.cos(E));
+const x=s.r*(Math.cos(E)-s.e),y=s.r*Math.sqrt(1-s.e*s.e)*Math.sin(E);
+const W=s.raan+s.dRaan*t,w=s.argp+s.dArgp*t,cW=Math.cos(W),sW=Math.sin(W),cw=Math.cos(w),sw=Math.sin(w),ci=Math.cos(s.inc),si=Math.sin(s.inc);
+const X=(cW*cw-sW*sw*ci)*x+(-cW*sw-sW*cw*ci)*y,Y=(sW*cw+cW*sw*ci)*x+(-sW*sw+cW*cw*ci)*y,Z=sw*si*x+cw*si*y;return[X,Z,-Y];}
+function inertialToFixed(p,t){const a=-OMEGA_E*t,c=Math.cos(a),s=Math.sin(a);return[p[0]*c+p[2]*s,p[1],-p[0]*s+p[2]*c];}
+const NL=150,NP=36,NLM=18,LMB=5*D2R;const grid=new Float64Array(NL*NP*NLM),gridA=new Float64Array(NL*NLM);
+const wrap=x=>{x%=TAU;return x<0?x+TAU:x;};
+const alive=(p,t)=>t>=p.tb&&t<p.tb+p.death;
+const phiAt=(p,t)=>p.phi0+p.wd*Math.max(0,t-p.tb);
+function buildGrid(P,t){grid.fill(0);gridA.fill(0);for(const p of P){if(!alive(p,t)||p.k===0)continue;const Li=Math.floor((p.L-1)/0.01);if(Li<0||Li>=NL)continue;
+const pi=Math.floor(wrap(phiAt(p,t))/TAU*NP)%NP;const lmi=Math.min(NLM-1,Math.floor(p.lm/LMB));grid[(Li*NP+pi)*NLM+lmi]+=p.k;gridA[Li*NLM+lmi]+=p.k;}
+for(let c=0;c<NL*NP;c++){const b=c*NLM;for(let k=NLM-2;k>=0;k--)grid[b+k]+=grid[b+k+1];}
+for(let c=0;c<NL;c++){const b=c*NLM;for(let k=NLM-2;k>=0;k--)gridA[b+k]+=gridA[b+k+1];}}
+function doseRate(pf,t){const l=toLocal(pf);const r=len(l);const lam=Math.asin(l[1]/r);const cl=Math.cos(lam),sl=Math.sin(lam);const L=r/(cl*cl);const Li=Math.floor((L-1)/0.01);if(Li<0||Li>=NL)return 0;
+const lmi=Math.floor(Math.abs(lam)/LMB);if(lmi>=NLM)return 0;
+let perRad;if(t<21600){const pi=Math.floor(wrap(Math.atan2(-l[2],l[0]))/TAU*NP)%NP;perRad=grid[(Li*NP+pi)*NLM+lmi]/(TAU/NP);}else perRad=gridA[Li*NLM+lmi]/TAU;
+const A=0.01*L*RE_CM*RE_CM*Math.pow(cl,6)/Math.sqrt(1+3*sl*sl);return perRad/A;}
+function burstL(lat,lon,alt){const l=toLocal(geo(lat,lon,1+alt/RE_KM));const r=len(l);return r/Math.pow(Math.cos(Math.asin(l[1]/r)),2);}
+return{RE_KM,OMEGA_E,TAU,geo,magPoint,makeParticles,makeSats,makeSatsFromData,satPos,inertialToFixed,buildGrid,doseRate,alive,phiAt,burstL,periods,O,A,U,Zm,toFixed,wrap};
+})();
+//PHYS-END
+</script>
+<script>
+{
+const P_=PHYS;
+const N=4000;let cal=0.15,srcK='central';
+const $=id=>document.getElementById(id);
+const fig=$('fig'),cv=$('cv');
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+const isMob=window.matchMedia&&matchMedia('(max-width: 900px), (pointer: coarse)').matches;
+renderer.setPixelRatio(Math.min(isMob?1.5:2,window.devicePixelRatio||1));
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(40,1,0.01,200);
+camera.position.set(2.2,1.6,3.6);
+const controls=new THREE.OrbitControls(camera,cv);
+controls.enableDamping=true;controls.minDistance=1.4;controls.maxDistance=30;
+scene.add(new THREE.AmbientLight(0xffffff,0.55));
+const sun=new THREE.DirectionalLight(0xffffff,0.8);sun.position.set(5,2,3);scene.add(sun);
+const earth=new THREE.Group();scene.add(earth);
+const tex=(()=>{const c=document.createElement('canvas');c.width=2048;c.height=1024;const g=c.getContext('2d');
+g.fillStyle='#121a26';g.fillRect(0,0,2048,1024);
+const X=lo=>(lo+180)/360*2048,Y=la=>(90-la)/180*1024;
+const land=[[[-165,62],[-168,66],[-156,71],[-128,70],[-95,72],[-80,73],[-62,60],[-56,52],[-66,45],[-75,35],[-81,25],[-82,30],[-90,29],[-97,26],[-97,20],[-90,21],[-87,15],[-83,10],[-79,8],[-85,11],[-92,15],[-105,20],[-112,30],[-118,34],[-124,40],[-124,48],[-135,58],[-150,60]],
+[[-45,60],[-20,70],[-20,82],[-60,82],[-70,77],[-55,68]],
+[[-79,8],[-60,10],[-50,0],[-35,-5],[-40,-22],[-48,-28],[-58,-38],[-65,-55],[-72,-52],[-74,-40],[-71,-20],[-81,-5],[-78,2]],
+[[-10,36],[-9,43],[-2,47],[-5,48],[5,53],[8,57],[5,62],[15,69],[30,70],[45,68],[70,73],[100,77],[140,72],[170,70],[180,66],[160,60],[142,52],[135,43],[127,37],[121,30],[110,20],[106,10],[100,13],[100,3],[98,8],[92,22],[80,15],[77,8],[72,20],[66,25],[57,26],[52,30],[48,30],[56,25],[59,22],[52,16],[44,12],[42,16],[35,28],[33,31],[36,36],[27,37],[26,40],[23,36],[20,40],[13,45],[16,38],[10,44],[3,43],[0,39],[-6,36]],
+[[-17,15],[-17,21],[-10,30],[-6,36],[10,37],[20,31],[32,31],[35,27],[43,12],[51,12],[40,-2],[40,-15],[35,-25],[20,-35],[17,-29],[12,-17],[13,-6],[9,4],[-8,4],[-15,10]],
+[[114,-22],[122,-18],[130,-12],[137,-12],[142,-11],[146,-19],[153,-28],[150,-37],[140,-38],[132,-32],[115,-34]],
+[[-6,50],[2,51],[-3,58],[-6,56]],[[130,31],[141,36],[142,45],[140,40]],[[95,5],[106,-6],[115,-8],[120,-2],[110,2],[100,2]],
+[[-180,-70],[180,-70],[180,-90],[-180,-90]]];
+const dec=(str,off,sc)=>{const r=[];let px=off[0],py=off[1];for(let i=0;i<str.length;i+=2){let x=str.charCodeAt(i)-64,y=str.charCodeAt(i+1)-64;x=(x>>1)^(-(x&1));y=(y>>1)^(-(y&1));x+=px;y+=py;px=x;py=y;r.push([x/sc,y/sc]);}return r;};
+const rings=[];
+try{const W=window.WORLD;if(W&&W.features){const enc=!!W.UTF8Encoding,sc=W.UTF8Scale||1024;
+for(const f of W.features){const gm=f.geometry;if(!gm)continue;const polys=gm.type==='Polygon'?[gm.coordinates]:gm.type==='MultiPolygon'?gm.coordinates:[];const offs=enc?(gm.type==='Polygon'?[gm.encodeOffsets]:gm.encodeOffsets):null;
+polys.forEach((poly,pi)=>poly.forEach((ring,ri)=>{const pts=enc?dec(ring,offs[pi][ri],sc):ring;if(pts.length>2)rings.push(pts);}));}}}catch(e){rings.length=0;}
+const drawRing=(pts,dx)=>{g.beginPath();let prev=pts[0][0],acc=0;pts.forEach((p,i)=>{let lo=p[0];if(i){const d=lo-prev;if(d>180)acc-=360;else if(d<-180)acc+=360;}prev=lo;const x=X(lo+acc+dx),y=Y(p[1]);i?g.lineTo(x,y):g.moveTo(x,y);});g.closePath();};
+g.fillStyle='#33404f';
+if(rings.length>50){for(const r of rings)for(const dx of [-360,0,360]){drawRing(r,dx);g.fill();}
+g.strokeStyle='rgba(190,205,225,0.22)';g.lineWidth=1;for(const r of rings)for(const dx of [-360,0,360]){drawRing(r,dx);g.stroke();}}
+else{for(const poly of land){g.beginPath();poly.forEach((p,i)=>i?g.lineTo(X(p[0]),Y(p[1])):g.moveTo(X(p[0]),Y(p[1])));g.closePath();g.fill();}}
+g.strokeStyle='rgba(160,180,205,0.18)';g.lineWidth=1.5;
+for(let lo=-180;lo<=180;lo+=30){g.beginPath();g.moveTo(X(lo),0);g.lineTo(X(lo),1024);g.stroke();}
+for(let la=-60;la<=60;la+=30){g.beginPath();g.moveTo(0,Y(la));g.lineTo(2048,Y(la));g.stroke();}
+const t=new THREE.CanvasTexture(c);t.anisotropy=8;return t;})();
+earth.add(new THREE.Mesh(new THREE.SphereGeometry(1,96,64),new THREE.MeshLambertMaterial({map:tex})));
+const mag=new THREE.Group();earth.add(mag);
+mag.position.set(P_.O[0],P_.O[1],P_.O[2]);
+const M=new THREE.Matrix4().makeBasis(new THREE.Vector3(...P_.A),new THREE.Vector3(...P_.U),new THREE.Vector3(...P_.Zm));
+mag.quaternion.setFromRotationMatrix(M);
+const axisGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,-1.5,0),new THREE.Vector3(0,1.5,0)]);
+mag.add(new THREE.Line(axisGeo,new THREE.LineDashedMaterial({color:0x6b7a90,dashSize:0.04,gapSize:0.04,transparent:true,opacity:0.5})).computeLineDistances());
+let fieldLines=new THREE.Group();mag.add(fieldLines);
+function buildFieldLines(Lb){mag.remove(fieldLines);fieldLines=new THREE.Group();
+const mat=new THREE.LineBasicMaterial({color:0x7d8ca3,transparent:true,opacity:0.28});
+const Ls=[1.15,1.3,1.6,2.0];if(Lb>1.02&&Lb<3)Ls.push(Lb);
+for(const L of Ls){const lmax=Math.acos(Math.sqrt(1/L))+0.03;const hot=(L===Lb);
+for(let k=0;k<(hot?24:12);k++){const phi=k*P_.TAU/(hot?24:12);const pts=[];
+for(let i=0;i<=60;i++){const lam=-lmax+2*lmax*i/60;const p=P_.magPoint(L*Math.pow(Math.cos(lam),2),lam,phi);pts.push(new THREE.Vector3(p[0],p[1],p[2]));}
+fieldLines.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),hot?new THREE.LineBasicMaterial({color:0xff8fb1,transparent:true,opacity:0.35}):mat));}}
+fieldLines.visible=$('fl').checked;mag.add(fieldLines);}
+const pGeo=new THREE.BufferGeometry();const pPos=new Float32Array(N*3);const pCol=new Float32Array(N*3);
+pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));pGeo.setAttribute('color',new THREE.BufferAttribute(pCol,3));
+const pts=new THREE.Points(pGeo,new THREE.PointsMaterial({size:0.012,vertexColors:true,transparent:true,opacity:0.9,blending:THREE.AdditiveBlending,depthWrite:false}));
+mag.add(pts);
+const GROUPS=['Starlink','OneWeb','Kuiper','Qianfan / Guowang','Iridium','Other LEO','O3b / mPOWER','Navigation (GPS, GLONASS, Galileo, BeiDou)','Other MEO','Highly elliptical','GEO and high orbits','MEO (navigation)'];
+const off=new Set();
+const promptR=()=>{const F=40*Math.max(1,thr/4e4);return Math.sqrt(0.7*cfg.Y*4.184e15/(4*Math.PI*F))/1000;};
+const isDead=s=>s.dose>thr||s.dist<promptR();
+let S=P_.makeSats(),sPos,sCol,thr=4e4,sel=null;
+const sGeo=new THREE.BufferGeometry();
+const sats=new THREE.Points(sGeo,new THREE.PointsMaterial({size:0.011,vertexColors:true}));scene.add(sats);
+const hs=$('hs');
+function drawHist(){const W=hs.clientWidth,H=hs.clientHeight;if(!W)return;
+const m={l:48,r:14,t:26,b:40},iw=W-m.l-m.r,ih=H-m.t-m.b,X0=-1,X1=5,NB=60;
+const bins=new Array(NB).fill(0);let zero=0,vis=0,past=0;const thrK=thr/1000;
+for(const s of S){if(off.has(s.g))continue;vis++;const d=s.dose/1000;if(isDead(s))past++;if(d<=0.0001){zero++;continue;}
+let b=Math.floor((Math.log10(d)-X0)/(X1-X0)*NB);b=Math.max(0,Math.min(NB-1,b));bins[b]++;}
+const mx=Math.max(1,...bins);const nice=v=>{const p=Math.pow(10,Math.floor(Math.log10(v)));return[1,2,5,10].map(k=>k*p).find(k=>k>=v);};const ym=nice(mx);
+const xs=v=>m.l+(Math.log10(v)-X0)/(X1-X0)*iw,ys=c=>m.t+ih-c/ym*ih;let o='';
+for(let k=0;k<=4;k++){const c=ym*k/4,y=ys(c);o+='<line x1="'+m.l+'" x2="'+(W-m.r)+'" y1="'+y+'" y2="'+y+'" style="stroke:var(--line)"/><text x="'+(m.l-8)+'" y="'+(y+4)+'" text-anchor="end" style="fill:var(--mut)" font-size="12">'+Math.round(c).toLocaleString()+'</text>';}
+const bw=iw/NB;bins.forEach((c,i)=>{if(!c)return;const mid=Math.pow(10,X0+(i+0.5)*(X1-X0)/NB);const y=ys(c);
+o+='<rect x="'+(m.l+i*bw+0.5)+'" y="'+y+'" width="'+Math.max(1,bw-1)+'" height="'+(m.t+ih-y)+'" fill="'+(mid>thrK?'#ff4a3d':'#8ff0c8')+'"><title>'+c.toLocaleString()+' satellites</title></rect>';});
+const lab=v=>v<1?String(v):v<1000?v+'':v===1000?'1 M':(v/1000)+' M';
+[0.1,1,10,100,1000,10000,100000].forEach(v=>{o+='<text x="'+xs(v)+'" y="'+(H-m.b+18)+'" text-anchor="middle" style="fill:var(--mut)" font-size="12">'+(v<1000?v:(v/1000)+'k')+'</text>';});
+o+='<text x="'+(m.l+iw/2)+'" y="'+(H-4)+'" text-anchor="middle" style="fill:var(--mut)" font-size="12">'+(W<520?'Dose, krad(Si), log scale':'Accumulated dose behind 2 mm aluminium, krad(Si), log scale')+'</text>';
+const TH=[[10,'10'],[40,'40'],[120,'120'],[300,'300 krad']];let lastX=-99;
+TH.forEach(([v,l])=>{const x=xs(v);const cur=Math.abs(v-thrK)<0.5;o+='<line x1="'+x+'" x2="'+x+'" y1="'+(m.t-4)+'" y2="'+(m.t+ih)+'" style="stroke:'+(cur?'var(--acc)':'var(--mut)')+'" stroke-width="'+(cur?2:1)+'"'+(cur?'':' stroke-dasharray="4 4"')+'/>';
+if(x-lastX>34){o+='<text x="'+x+'" y="'+(m.t-10)+'" text-anchor="middle" style="fill:'+(cur?'var(--acc)':'var(--mut)')+'" font-size="12">'+l+'</text>';lastX=x;}});
+hs.innerHTML=o;
+let pk=0;for(const s of S)if(!off.has(s.g)&&s.dist<promptR())pk++;
+$('hN').textContent=vis.toLocaleString()+' satellites shown, '+past.toLocaleString()+' failed ('+pk.toLocaleString()+' of them in the initial flash, which the bars don’t show), '+zero.toLocaleString()+' with no dose and left off the chart. Dashed lines are the four threshold presets; orange is the one selected.';}
+const hro=new ResizeObserver(()=>drawHist());hro.observe($('hist'));
+function buildTable(){const tot={};for(const s of S)tot[s.g]=(tot[s.g]||0)+1;
+$('gtb').innerHTML=GROUPS.map((g,i)=>tot[g]?'<tr id="gr'+i+'"'+(off.has(g)?' class="off"':'')+'><td><label><input type="checkbox" data-g="'+i+'"'+(off.has(g)?'':' checked')+'>'+g+'</label></td><td class="n">'+tot[g].toLocaleString()+'</td><td class="n" id="gb'+i+'">0</td></tr>':'').join('')+'<tr><td>Shown in total</td><td class="n" id="gT">0</td><td class="n" id="gB">0</td></tr>';}
+function setGroup(i,on){const g=GROUPS[i];if(on)off.delete(g);else off.add(g);const r=$('gr'+i);if(r){r.classList.toggle('off',!on);const c=r.querySelector('input');if(c)c.checked=on;}
+if(sel&&off.has(sel.g)){hi.visible=false;}else if(sel)hi.visible=true;if(P.length)stats();}
+function setSats(list){S=list;sPos=new Float32Array(S.length*3);sCol=new Float32Array(S.length*3);
+sGeo.setAttribute('position',new THREE.BufferAttribute(sPos,3));sGeo.setAttribute('color',new THREE.BufferAttribute(sCol,3));sGeo.setDrawRange(0,S.length);buildTable();}
+setSats(S);
+const hiGeo=new THREE.BufferGeometry();hiGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(3),3));
+const hi=new THREE.Points(hiGeo,new THREE.PointsMaterial({size:0.05,color:0xffffff}));hi.visible=false;scene.add(hi);
+fetch('sats.json').then(r=>r.json()).then(rows=>{const L=P_.makeSatsFromData(rows);setSats(L);detonate();$('src').textContent='Satellites: '+L.length.toLocaleString()+' active objects from CelesTrak’s catalogue, 20 Nov 2026.';}).catch(()=>{$('src').textContent='Satellite catalogue could not load, so generic example shells are shown.';});
+const marker=new THREE.Mesh(new THREE.SphereGeometry(0.015,12,8),new THREE.MeshBasicMaterial({color:0xffd0de}));earth.add(marker);
+const promptSph=new THREE.Mesh(new THREE.SphereGeometry(1,32,20),new THREE.MeshBasicMaterial({color:0xffd0de,transparent:true,opacity:0.07,depthWrite:false}));earth.add(promptSph);
+function updPrompt(){const r=promptR();promptSph.scale.setScalar(r/6371);$('prO').textContent=Math.round(r).toLocaleString()+' km';}
+const radTex=stops=>{const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d');const gr=g.createRadialGradient(128,128,0,128,128,128);stops.forEach(([o,col])=>gr.addColorStop(o,col));g.fillStyle=gr;g.fillRect(0,0,256,256);return new THREE.CanvasTexture(c);};
+const ADD={transparent:true,blending:THREE.AdditiveBlending,depthWrite:false};
+const fx=new THREE.Group();earth.add(fx);fx.visible=false;
+const flashSpr=new THREE.Sprite(new THREE.SpriteMaterial(Object.assign({map:radTex([[0,'rgba(255,255,255,1)'],[0.08,'rgba(255,255,250,0.95)'],[0.25,'rgba(210,225,255,0.35)'],[0.6,'rgba(160,180,255,0.08)'],[1,'rgba(0,0,0,0)']])},ADD)));fx.add(flashSpr);
+const glowSpr=new THREE.Sprite(new THREE.SpriteMaterial(Object.assign({map:radTex([[0,'rgba(255,240,210,1)'],[0.3,'rgba(255,170,80,0.5)'],[0.7,'rgba(200,60,40,0.12)'],[1,'rgba(0,0,0,0)']])},ADD)));fx.add(glowSpr);
+const shellMat=new THREE.ShaderMaterial({uniforms:{col:{value:new THREE.Color(1,1,1)},op:{value:1}},vertexShader:'varying vec3 vN;varying vec3 vV;void main(){vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.0);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
+fragmentShader:'uniform vec3 col;uniform float op;varying vec3 vN;varying vec3 vV;void main(){float f=pow(1.0-abs(dot(vN,vV)),1.6);gl_FragColor=vec4(col*(0.25+1.2*f),op*(0.15+0.85*f));}',transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
+const shell=new THREE.Mesh(new THREE.SphereGeometry(1,48,32),shellMat);fx.add(shell);
+const capTex=radTex([[0,'rgba(255,90,70,0.9)'],[0.35,'rgba(230,50,50,0.55)'],[0.75,'rgba(150,20,40,0.15)'],[1,'rgba(0,0,0,0)']]);
+const aurTex=radTex([[0,'rgba(120,255,170,0.85)'],[0.3,'rgba(90,230,140,0.45)'],[0.55,'rgba(230,60,80,0.35)'],[1,'rgba(0,0,0,0)']]);
+const mkCap=tex=>{const m=new THREE.Mesh(new THREE.CircleGeometry(1,64),new THREE.MeshBasicMaterial(Object.assign({map:tex,side:THREE.DoubleSide},ADD)));fx.add(m);return m;};
+const xcap=mkCap(capTex),aurN=mkCap(aurTex),aurS=mkCap(aurTex);
+let streamer=null;const streamMat=new THREE.MeshBasicMaterial(Object.assign({color:0xd08cff,opacity:0},ADD));
+const V3=a=>new THREE.Vector3(a[0],a[1],a[2]);
+function placeCap(m,p,rad){const n=V3(p).normalize();m.position.copy(n).multiplyScalar(1+90/6371);m.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),n);m.scale.setScalar(rad);}
+let fxT=-1,fxScale=1;
+const burstLight=new THREE.PointLight(0xfff2dc,0,3,1);fx.add(burstLight);
+const bfl=document.getElementById('bflash');const RM=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const wv=new THREE.Vector3(),wn=new THREE.Vector3();
+function setupFx(bp){fx.visible=true;fxT=0;fxScale=Math.cbrt(cfg.Y/1.4);
+[flashSpr,glowSpr,shell,burstLight].forEach(o=>o.position.set(...bp));
+const rb=Math.hypot(...bp);const loc=(()=>{const d=[bp[0]-P_.O[0],bp[1]-P_.O[1],bp[2]-P_.O[2]];return[d[0]*P_.A[0]+d[1]*P_.A[1]+d[2]*P_.A[2],d[0]*P_.U[0]+d[1]*P_.U[1]+d[2]*P_.U[2],d[0]*P_.Zm[0]+d[1]*P_.Zm[1]+d[2]*P_.Zm[2]];})();
+const r=Math.hypot(...loc),lam=Math.asin(loc[1]/r),phi=Math.atan2(-loc[2],loc[0]),L=r/Math.pow(Math.cos(lam),2);
+const t1=P_.toFixed(P_.magPoint(L*Math.pow(Math.cos(lam+0.01),2),lam+0.01,phi)),t0=P_.toFixed(P_.magPoint(L*Math.pow(Math.cos(lam-0.01),2),lam-0.01,phi));
+shell.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),V3(t1).sub(V3(t0)).normalize());
+placeCap(xcap,bp,900*fxScale/6371);
+const rf=1+100/6371,lf=Math.acos(Math.min(1,Math.sqrt(rf/L)));
+placeCap(aurN,P_.toFixed(P_.magPoint(rf,lf,phi)),350*fxScale/6371);placeCap(aurS,P_.toFixed(P_.magPoint(rf,-lf,phi)),350*fxScale/6371);
+if(streamer){fx.remove(streamer);streamer.geometry.dispose();}
+const pts=[];for(let i=0;i<=120;i++){const la=-lf+2*lf*i/120;pts.push(V3(P_.toFixed(P_.magPoint(L*Math.pow(Math.cos(la),2),la,phi))));}
+streamer=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),240,0.0035,6,false),streamMat);fx.add(streamer);}
+const ease=(x,a,b)=>Math.max(0,Math.min(1,(x-a)/(b-a)));
+function updFx(dt){if(fxT<0)return;fxT+=dt;const T=fxT,k=fxScale;
+promptSph.visible=T<1;promptSph.material.opacity=0.12*(T<0.5?1:Math.max(0,2-2*T));flashSpr.material.opacity=Math.min(1,1.6*Math.exp(-T/0.2));flashSpr.scale.setScalar((1.6+5*T)*k);
+burstLight.intensity=8*Math.exp(-T/0.35)*Math.sqrt(k);
+if(T<2.5){flashSpr.getWorldPosition(wv);wn.copy(wv).normalize();const vis=wn.dot(camera.position.clone().sub(wv).normalize())>-0.15?1:0.35;
+wv.project(camera);const x=(wv.x+1)/2*fig.clientWidth,y=(1-wv.y)/2*fig.clientHeight;
+const a=vis*Math.exp(-T/0.3)*(RM?0.4:1),veil=RM?0:vis*0.9*Math.exp(-T/0.07);
+bfl.style.opacity=1;bfl.style.background='linear-gradient(rgba(255,255,255,'+veil.toFixed(3)+'),rgba(255,255,255,'+veil.toFixed(3)+')),radial-gradient(circle at '+x.toFixed(0)+'px '+y.toFixed(0)+'px,rgba(255,255,255,'+a.toFixed(3)+') 0%,rgba(240,244,255,'+(0.85*a).toFixed(3)+') 12%,rgba(205,220,255,'+(0.4*a).toFixed(3)+') 35%,rgba(160,180,255,'+(0.12*a).toFixed(3)+') 60%,rgba(0,0,0,0) 85%)';}
+else if(bfl.style.opacity!=='0'){bfl.style.opacity=0;}
+glowSpr.material.opacity=ease(T,0,0.15)*Math.exp(-T/2.5);glowSpr.scale.setScalar((0.08+0.12*Math.sqrt(T))*k);
+const R=(0.004+0.05*(1-Math.exp(-T/1.6)))*k;shell.scale.set(R,R*(1+1.8*ease(T,0.3,5)),R);
+const c=Math.max(0,1-T/6);shellMat.uniforms.col.value.setRGB(1,0.35+0.65*Math.pow(c,1.5),0.15+0.85*Math.pow(c,4));shellMat.uniforms.op.value=ease(T,0,0.1)*Math.exp(-T/7);
+xcap.material.opacity=ease(T,0.05,0.6)*Math.exp(-T/12);
+const a=ease(T,1,4)*Math.exp(-T/30)*(0.85+0.15*Math.sin(T*3.1));aurN.material.opacity=a;aurS.material.opacity=a*0.9;
+streamMat.opacity=ease(T,0.3,1.5)*Math.exp(-T/15)*(0.6+0.4*Math.sin(T*7));
+if(T>90){fx.visible=false;fxT=-1;}}
+const CK=isMob?12:24,cPos=new Float32Array(N*CK*3),cGeo=new THREE.BufferGeometry();cGeo.setAttribute('position',new THREE.BufferAttribute(cPos,3));
+const jL=new Float32Array(N*CK),jP=new Float32Array(N*CK),jB=new Float32Array(N*CK);
+for(let q=0;q<N*CK;q++){jL[q]=0.012*Math.sqrt(-2*Math.log(Math.random()+1e-9))*Math.cos(6.2832*Math.random());jP[q]=2*Math.random()-1;jB[q]=Math.random();}
+const cloud=new THREE.Points(cGeo,new THREE.PointsMaterial(Object.assign({size:0.075,map:radTex([[0,'rgba(255,255,255,1)'],[0.4,'rgba(255,255,255,0.5)'],[1,'rgba(255,255,255,0)']]),color:0xff4f8b,opacity:0.075*24/CK,sizeAttenuation:true},ADD)));cloud.visible=true;mag.add(cloud);pts.material.opacity=0.35;
+function updCloud(){for(let i=0;i<P.length;i++){const p=P[i],o=i*CK*3;if(!P_.alive(p,t)){for(let k=0;k<CK*3;k++)cPos[o+k]=0;continue;}
+const phi0=P_.phiAt(p,t),sig=Math.min(Math.PI,0.05+0.5*p.wd*Math.max(0,t-p.tb));
+for(let k=0;k<CK;k++){const q=i*CK+k;const lam=p.lm*Math.sin(P_.TAU*(k+jB[q])/CK);const L=Math.max(1.01,p.L+jL[q]);const phi=phi0+sig*jP[q];
+const cl=Math.cos(lam),r=L*cl*cl;cPos[o+k*3]=r*cl*Math.cos(phi);cPos[o+k*3+1]=r*Math.sin(lam);cPos[o+k*3+2]=-r*cl*Math.sin(phi);}}
+cGeo.attributes.position.needsUpdate=true;}
+let P=[],t=0,playing=true,warp=60,cfg={lat:16.7,lon:-169.5,alt:400,Y:1.4};
+const fmtT=s=>s<60?s.toFixed(s<10?1:0)+' s':s<3600?Math.floor(s/60)+' min '+Math.floor(s%60)+' s':s<86400?(s/3600).toFixed(1)+' h':s<86400*60?(s/86400).toFixed(1)+' days':s<3.156e7*2?(s/2.6298e6).toFixed(1)+' months':(s/3.156e7).toFixed(2)+' years';
+const fmtD=x=>x<0.01?'0':x<10?x.toFixed(2):Math.round(x).toLocaleString();
+const fmtK=rad=>{const k=rad/1000;return k<0.01?'0 krad':k<10?k.toFixed(2)+' krad':k<10000?Math.round(k).toLocaleString()+' krad':(k/1000).toFixed(1)+' Mrad';};
+function detonate(){P=P_.makeParticles(N,cfg.lat,cfg.lon,cfg.alt,cfg.Y,srcK);t=0;for(const s of S)s.dose=0;
+for(let i=0;i<N;i++){const p=P[i];const k=Math.min(1,p.E/3);pCol[i*3]=1;pCol[i*3+1]=0.31+0.5*k;pCol[i*3+2]=0.55+0.35*k;}
+pGeo.attributes.color.needsUpdate=true;
+const bp=P_.geo(cfg.lat,cfg.lon,1+cfg.alt/6371);marker.position.set(...bp);promptSph.position.set(...bp);
+const Rb=1+100/6371;for(const s of S){const q=P_.satPos(s,0);const d=[q[0]-bp[0],q[1]-bp[1],q[2]-bp[2]];const L2=d[0]*d[0]+d[1]*d[1]+d[2]*d[2];
+let k=-(bp[0]*d[0]+bp[1]*d[1]+bp[2]*d[2])/L2;k=Math.max(0,Math.min(1,k));const c=Math.hypot(bp[0]+k*d[0],bp[1]+k*d[1],bp[2]+k*d[2]);s.dist=c<Rb?Infinity:Math.sqrt(L2)*6371;}
+updPrompt();setupFx(bp);
+const tl=P.filter(p=>p.kind===0&&p.tb<20).map(p=>p.L).sort((a,b)=>a-b);const Lb=tl.length?tl[Math.floor(tl.length/2)]:P_.burstL(cfg.lat,cfg.lon,cfg.alt);buildFieldLines(Lb);
+$('LO').textContent=Lb.toFixed(3);
+const pr=P_.periods(Lb,1,0.7);
+$('per').textContent='A 1 MeV electron on this shell bounces between hemispheres every '+pr.Tb.toFixed(2)+' s and drifts once around Earth every '+Math.round(P_.TAU/pr.wd/60)+' min.';
+playing=true;$('pp').textContent='Pause';}
+function step(dt){P_.buildGrid(P,t);for(const s of S){if(s.r>3)continue;s.dose+=P_.doseRate(P_.inertialToFixed(P_.satPos(s,t),t),t)*dt*cal;}}
+function stats(){let tr=0,l1=0,l2=0,born=0;for(const p of P){if(t<p.tb)continue;born++;if(P_.alive(p,t))tr++;else if(p.kind===1)l1++;else l2++;}const bn=Math.max(1,born);
+$('tO').textContent=fmtT(t);$('trO').textContent=(100*tr/bn).toFixed(1)+'%';{let pk=0;for(const s of S)if(!off.has(s.g)&&s.dist<promptR())pk++;$('pkO').textContent=pk.toLocaleString();}
+$('l1O').textContent=(100*l1/bn).toFixed(1)+'%';$('l2O').textContent=(100*l2/bn).toFixed(1)+'%';
+const tot={},bad={};let iss=0,css=0,T=0,B=0;
+for(const s of S){tot[s.g]=(tot[s.g]||0)+1;if(isDead(s))bad[s.g]=(bad[s.g]||0)+1;if(s.name==='ISS (ZARYA)')iss=s.dose;if(s.name==='CSS (TIANHE)')css=s.dose;}
+GROUPS.forEach((g,i)=>{const c=$('gb'+i);if(!c)return;const b=bad[g]||0;c.textContent=b.toLocaleString()+(b?' ('+Math.round(100*b/tot[g])+'%)':'');c.style.color=b&&!off.has(g)?'var(--red)':'';if(!off.has(g)){T+=tot[g]||0;B+=b;}});
+{let fk=0,bk=0;const pr=promptR();for(const s of S){if(s.dist<pr)fk++;else if(s.dose>thr)bk++;}$('hudF').textContent=fk.toLocaleString();$('hudB').textContent=bk.toLocaleString();$('hudT').textContent='of all '+S.length.toLocaleString()+' active satellites';}
+$('gT').textContent=T.toLocaleString();drawHist();$('gB').textContent=B.toLocaleString();
+$('s3O').textContent=fmtK(iss);$('s4O').textContent=fmtK(css);
+if(sel)$('qO').textContent=sel.name+' ('+sel.own+'): '+sel.per+'–'+sel.apo+' km, '+(sel.inc/Math.PI*180).toFixed(1)+'°. Dose '+fmtK(sel.dose)+' of '+fmtK(thr)+' limit'+(sel.dist<promptR()?', destroyed by the initial flash ('+Math.round(sel.dist)+' km away).':sel.dose>thr?', past the threshold.':'.');}
+const lb1=$('lb1'),lb2=$('lb2');const saaLocal=new THREE.Vector3(...P_.geo(-26,-50,1.0));const v=new THREE.Vector3(),n=new THREE.Vector3();
+function place(el,localPt){v.copy(localPt);earth.localToWorld(v);n.copy(v).normalize();const cd=camera.position.clone().sub(v).normalize();
+if(n.dot(cd)<0.05){el.style.display='none';return;}v.project(camera);el.style.display='';el.style.left=((v.x+1)/2*fig.clientWidth)+'px';el.style.top=((1-v.y)/2*fig.clientHeight)+'px';}
+function resize(){const w=fig.clientWidth,h=fig.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+const ro=new ResizeObserver(resize);ro.observe(fig);
+let last=performance.now(),acc=0;
+let stepAcc=0,stepWall=0;
+function frame(now){const wall=Math.min(0.1,(now-last)/1000);last=now;
+if(playing&&P.length){const dt=wall*warp;t+=dt;stepAcc+=dt;stepWall+=wall;if(!isMob||stepWall>=1/30){step(stepAcc);stepAcc=0;stepWall=0;}}
+earth.rotation.y=P_.OMEGA_E*t;
+for(let i=0;i<P.length;i++){const p=P[i];if(!P_.alive(p,t)){pPos[i*3]=pPos[i*3+1]=pPos[i*3+2]=0;continue;}
+if(playing)p.ph+=wall*P_.TAU/p.vb;const lam=p.lm*Math.sin(p.ph);const phi=P_.phiAt(p,t);const r=p.L*Math.pow(Math.cos(lam),2);
+pPos[i*3]=r*Math.cos(lam)*Math.cos(phi);pPos[i*3+1]=r*Math.sin(lam);pPos[i*3+2]=-r*Math.cos(lam)*Math.sin(phi);}
+pGeo.attributes.position.needsUpdate=true;
+if(cloud.visible)updCloud();
+for(let i=0;i<S.length;i++){const s=S[i];const p=P_.satPos(s,t);sPos[i*3]=p[0];sPos[i*3+1]=p[1];sPos[i*3+2]=p[2];
+if(off.has(s.g)){sPos[i*3]=sPos[i*3+1]=sPos[i*3+2]=0;continue;}const f=Math.min(1,s.dose/thr);const dead=isDead(s);sCol[i*3]=dead?1:0.56+0.44*f;sCol[i*3+1]=dead?0.29:0.94-0.5*f;sCol[i*3+2]=dead?0.24:0.78-0.5*f;
+}
+if(sel){const p=P_.satPos(sel,t);hiGeo.attributes.position.setXYZ(0,p[0],p[1],p[2]);hiGeo.attributes.position.needsUpdate=true;}
+sGeo.attributes.position.needsUpdate=true;sGeo.attributes.color.needsUpdate=true;
+updFx(wall);
+controls.update();renderer.render(scene,camera);
+{const z=n=>String(n).padStart(2,'0');const sec=Math.floor(t);let txt;
+if(t<86400)txt=z(Math.floor(sec/3600))+':'+z(Math.floor(sec/60)%60)+':'+z(sec%60);
+else if(t<86400*100)txt=Math.floor(t/86400)+' d '+z(Math.floor(sec/3600)%24)+':'+z(Math.floor(sec/60)%60);
+else if(t<3.156e7)txt=Math.floor(t/86400)+' days';else txt=(t/3.156e7).toFixed(2)+' years';
+const c=$('clk');const v='T+ '+txt;if(c.textContent!==v)c.textContent=v;}
+place(lb1,marker.position);place(lb2,saaLocal);
+acc+=wall;if(acc>0.2){acc=0;if(P.length)stats();}
+requestAnimationFrame(frame);}
+const syncOut=()=>{$('altO').textContent=cfg.alt+' km';$('latO').textContent=cfg.lat.toFixed(1)+'°';$('lonO').textContent=String(cfg.lon.toFixed(1)).replace('-','−')+'°';};
+$('preset').addEventListener('change',e=>{if(e.target.value==='custom')return;const [la,lo,al]=e.target.value.split(',').map(Number);cfg={lat:la,lon:lo,alt:al,Y:cfg.Y};$('lat').value=la;$('lon').value=lo;$('alt').value=al;syncOut();detonate();});
+for(const id of ['alt','lat','lon'])$(id).addEventListener('input',e=>{cfg[id]=+e.target.value;$('preset').value='custom';syncOut();});
+for(const id of ['alt','lat','lon'])$(id).addEventListener('change',()=>detonate());
+$('go').addEventListener('click',detonate);$('go2').addEventListener('click',detonate);
+$('pp').addEventListener('click',()=>{playing=!playing;$('pp').textContent=playing?'Pause':'Play';});
+$('warp').addEventListener('change',e=>{warp=+e.target.value;});
+$('fl').addEventListener('change',e=>{fieldLines.visible=e.target.checked;});
+$('cl').addEventListener('change',e=>{cloud.visible=e.target.checked;pts.material.opacity=e.target.checked?0.35:0.9;if(P.length)updCloud();});
+$('gps').addEventListener('change',e=>{camera.position.setLength(e.target.checked?16:4.6);});
+$('gtb').addEventListener('change',e=>{const i=e.target.dataset&&e.target.dataset.g;if(i!=null)setGroup(+i,e.target.checked);});
+$('gAll').addEventListener('click',()=>GROUPS.forEach((g,i)=>setGroup(i,true)));
+$('gNone').addEventListener('click',()=>GROUPS.forEach((g,i)=>setGroup(i,false)));
+$('thrS').addEventListener('change',e=>{thr=1000*(+e.target.value);updPrompt();if(P.length)stats();});
+$('srcS').addEventListener('change',e=>{srcK=e.target.value;detonate();});
+$('calS').addEventListener('change',e=>{const f=+e.target.value;for(const s of S)s.dose*=f/cal;cal=f;if(P.length)stats();});
+$('yld').addEventListener('change',e=>{cfg.Y=+e.target.value;detonate();});
+$('q').addEventListener('input',e=>{const q=e.target.value.trim().toUpperCase();if(q.length<2){sel=null;hi.visible=false;$('qO').textContent='';return;}
+sel=S.find(s=>s.name===q)||S.find(s=>s.name&&s.name.startsWith(q))||S.find(s=>s.name&&s.name.includes(q))||S.find(s=>s.id===q)||null;hi.visible=!!sel;if(!sel)$('qO').textContent='No active satellite matches “'+e.target.value+'”.';else stats();});
+syncOut();resize();detonate();requestAnimationFrame(frame);
+}
+</script>
+</body>
+</html>
