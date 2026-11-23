@@ -444,7 +444,7 @@ if(T>90){fx.visible=false;fxT=-1;}}
 const CK=isMob?12:24,cPos=new Float32Array(N*CK*3),cGeo=new THREE.BufferGeometry();cGeo.setAttribute('position',new THREE.BufferAttribute(cPos,3));
 const jL=new Float32Array(N*CK),jP=new Float32Array(N*CK),jB=new Float32Array(N*CK);
 for(let q=0;q<N*CK;q++){jL[q]=0.012*Math.sqrt(-2*Math.log(Math.random()+1e-9))*Math.cos(6.2832*Math.random());jP[q]=2*Math.random()-1;jB[q]=Math.random();}
-const cloud=new THREE.Points(cGeo,new THREE.PointsMaterial(Object.assign({size:0.075,map:radTex([[0,'rgba(255,255,255,1)'],[0.4,'rgba(255,255,255,0.5)'],[1,'rgba(255,255,255,0)']]),color:0xff4f8b,opacity:0.075*24/CK,sizeAttenuation:true},ADD)));cloud.visible=true;mag.add(cloud);pts.material.opacity=0.35;
+const cloud=new THREE.Points(cGeo,new THREE.PointsMaterial(Object.assign({size:0.075,map:radTex([[0,'rgba(255,255,255,1)'],[0.4,'rgba(255,255,255,0.5)'],[1,'rgba(255,255,255,0)']]),color:0xff4f8b,opacity:0.1125*24/CK,sizeAttenuation:true},ADD)));cloud.visible=true;mag.add(cloud);pts.material.opacity=0.525;
 function updCloud(){for(let i=0;i<P.length;i++){const p=P[i],o=i*CK*3;if(!P_.alive(p,t)){for(let k=0;k<CK*3;k++)cPos[o+k]=0;continue;}
 const phi0=P_.phiAt(p,t),sig=Math.min(Math.PI,0.05+0.5*p.wd*Math.max(0,t-p.tb));
 for(let k=0;k<CK;k++){const q=i*CK+k;const lam=p.lm*Math.sin(P_.TAU*(k+jB[q])/CK);const L=Math.max(1.01,p.L+jL[q]);const phi=phi0+sig*jP[q];

@@ -69,7 +69,7 @@ Units: distances in Earth radii (RE = 6371 km) unless noted, time in seconds. Co
   - `mag` group: a child of `earth`, positioned at O with the basis A,U,Zm. It holds field lines, electron points and the density cloud.
   - Satellites are drawn in the inertial frame (`scene`).
 - **Electrons:** `pts` (N points, additive blending, colour by energy). Bounce motion is drawn slowed down (period 1.6–3.2 s of wall time), with the true drift.
-- **Density cloud** (`cloud`, on by default): `CK` blobs per electron (24 on desktop, 12 on mobile, with opacity scaled by 24/CK), opacity 0.075, size 0.075, additive. Each blob has a fixed random bounce phase, ±0.012 in L (Gaussian), and a longitude spread of ±σ with `σ = min(π, 0.05 + 0.5·wd·age)`, imitating the energy spread within each simulated bundle. The dots dim to 0.35 opacity while the cloud is on.
+- **Density cloud** (`cloud`, on by default): `CK` blobs per electron (24 on desktop, 12 on mobile, with opacity scaled by 24/CK), opacity 0.1125 (raised 50% from 0.075 on user request), size 0.075, additive. Each blob has a fixed random bounce phase, ±0.012 in L (Gaussian), and a longitude spread of ±σ with `σ = min(π, 0.05 + 0.5·wd·age)`, imitating the energy spread within each simulated bundle. The electron dots are drawn at 0.525 opacity (raised 50% from 0.35 on user request); the "Radiation belt" checkbox hides both cloud and dots.
 - **Field lines:** shells at L = 1.15, 1.3, 1.6 and 2.0, plus the belt-core shell (median L of trapped electrons) in pink. Off by default.
 - **Burst effects** (`setupFx`/`updFx`, wall-clock time `fxT`, sizes scaled by `cbrt(Y/1.4)`):
   - **Flash:** a white flash sprite (opacity `min(1, 1.6·e^(−T/0.2))`, scale `(1.6+5T)k`) and a point light on Earth (`8·e^(−T/0.35)`).
