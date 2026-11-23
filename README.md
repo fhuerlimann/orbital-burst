@@ -55,3 +55,7 @@ This is a simplified physics model for education, not a predictive tool. The pag
 - E. G. Stassinopoulos (2015), *The STARFISH Exo-atmospheric, High-altitude Nuclear Weapons Test*, NASA NTRS 20150018896
 - DTRA (2001), *High Altitude Nuclear Detonations (HAND) Against Low Earth Orbit Satellites*
 - Satellite catalogue: [CelesTrak SATCAT](https://celestrak.org)
+
+## License
+
+The code is released under the [MIT License](LICENSE). The satellite data in `sats.json` and `data/satcat.csv` comes from CelesTrak and is not covered by this licence; credit CelesTrak when you reuse it.

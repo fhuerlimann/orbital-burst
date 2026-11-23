@@ -34,7 +34,7 @@ Runtime dependencies (CDN, pinned versions; keep them):
 - `https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js`
 - Google Fonts: Archivo (variable wdth 62–125, wght 400–800) and IBM Plex Mono 400/500
 
-Hosting: the claude.ai artifact (private until the user shares it) and the planned GitHub repo `orbital-burst` with GitHub Pages. No licence has been chosen yet. MIT was suggested; **ask the user before adding one**.
+Hosting: the claude.ai artifact (private until the user shares it) and the GitHub repo `fhuerlimann/orbital-burst` (public), served with GitHub Pages from `main` / root at https://fhuerlimann.github.io/orbital-burst/. Licence: MIT for the code (`LICENSE`); the CelesTrak satellite data is not covered by it.
 
 ---
 
@@ -167,7 +167,6 @@ Units: distances in Earth radii (RE = 6371 km) unless noted, time in seconds. Co
 - A full IGRF field instead of the eccentric dipole; natural inner-belt protons; solar-cell degradation; spacecraft charging.
 - Load live TLEs (CelesTrak) with SGP4 (satellite.js) for real orbital phases.
 - Intensity slider for the density cloud (offered, not requested).
-- MIT licence (suggested; awaiting the user's decision).
 - Social preview image (og:image) for X link cards.
 
 ## 8. Sources
