@@ -390,7 +390,8 @@ sGeo.setAttribute('position',new THREE.BufferAttribute(sPos,3));sGeo.setAttribut
 setSats(S);
 const hiGeo=new THREE.BufferGeometry();hiGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(3),3));
 const hi=new THREE.Points(hiGeo,new THREE.PointsMaterial({size:0.05,color:0xffffff}));hi.visible=false;satG.add(hi);
-fetch('sats.json').then(r=>r.json()).then(rows=>{const L=P_.makeSatsFromData(rows);setSats(L);detonate();$('src').textContent='Satellites: '+L.length.toLocaleString()+' active objects from CelesTrak’s catalogue, 20 Nov 2026.';}).catch(()=>{$('src').textContent='Satellite catalogue could not load, so generic example shells are shown.';});
+let bootN=0;const boot=()=>{if(++bootN===2)detonate();};
+fetch('sats.json').then(r=>r.json()).then(rows=>{const L=P_.makeSatsFromData(rows);setSats(L);boot();$('src').textContent='Satellites: '+L.length.toLocaleString()+' active objects from CelesTrak’s catalogue, 20 Nov 2026.';}).catch(()=>{$('src').textContent='Satellite catalogue could not load, so generic example shells are shown.';boot();});
 const marker=new THREE.Mesh(new THREE.SphereGeometry(0.015,12,8),new THREE.MeshBasicMaterial({color:0xffd0de}));earth.add(marker);
 const promptSph=new THREE.Mesh(new THREE.SphereGeometry(1,32,20),new THREE.MeshBasicMaterial({color:0xffd0de,transparent:true,opacity:0.07,depthWrite:false}));earth.add(promptSph);
 function updPrompt(){const r=promptR();promptSph.scale.setScalar(r/6371);$('prO').textContent=Math.round(r).toLocaleString()+' km';}
@@ -504,7 +505,7 @@ if(t<86400)txt=z(Math.floor(sec/3600))+':'+z(Math.floor(sec/60)%60)+':'+z(sec%60
 else if(t<86400*100)txt=Math.floor(t/86400)+' d '+z(Math.floor(sec/3600)%24)+':'+z(Math.floor(sec/60)%60);
 else if(t<3.156e7)txt=Math.floor(t/86400)+' days';else txt=(t/3.156e7).toFixed(2)+' years';
 const c=$('clk');const v='T+ '+txt;if(c.textContent!==v)c.textContent=v;}
-place(lb1,marker.position);
+if(P.length)place(lb1,marker.position);
 acc+=wall;if(acc>0.2){acc=0;if(P.length)stats();}
 requestAnimationFrame(frame);}
 const syncOut=()=>{$('altO').textContent=cfg.alt+' km';$('latO').textContent=cfg.lat.toFixed(1)+'°';$('lonO').textContent=String(cfg.lon.toFixed(1)).replace('-','−')+'°';};
@@ -523,7 +524,7 @@ $('thrS').addEventListener('change',e=>{thr=1000*(+e.target.value);updPrompt();i
 $('srcS').addEventListener('change',e=>{srcK=e.target.value;detonate();});
 $('calS').addEventListener('change',e=>{const f=+e.target.value;for(const s of S)s.dose*=f/cal;cal=f;if(P.length)stats();});
 $('yld').addEventListener('change',e=>{cfg.Y=+e.target.value;detonate();});
-syncOut();resize();detonate();requestAnimationFrame(frame);
+syncOut();resize();promptSph.visible=false;lb1.style.display='none';requestAnimationFrame(frame);setTimeout(boot,500);
 }
 </script>
 </body>

@@ -149,7 +149,7 @@ Units: distances in Earth radii (RE = 6371 km) unless noted, time in seconds. Co
 - Threshold **40 krad(Si)** (options 10 / 40 / 120 / 300). Electron source **Central**. Dose model **calibrated (0.15)**.
 - **Radiation belt (density cloud + electrons) on, field lines off, all satellite groups visible**, satellites shown.
 - Camera: looks at 21°N 105°W from 4.51 RE (North America centred, the Starfish burst over Johnston visible on the western limb). User-requested.
-- Speed: 1 minute per second. The page auto-detonates on load, and again once sats.json has loaded.
+- Speed: 1 minute per second. The page detonates once, 0.5 s after load (user request), or as soon as sats.json has loaded if that takes longer (`boot()` waits for both). Before that the scene shows Earth and satellites with no burst, and the Burst label is hidden.
 - Satellite groups (the order in `GROUPS` must match build_sats.py): Starlink 11,199 · Other LEO 3,682 · OneWeb 651 · GEO and high orbits 593 · Qianfan / Guowang 545 · Kuiper 391 · Navigation (GPS, GLONASS, Galileo, BeiDou) 160 · Iridium 80 · Highly elliptical 55 · O3b / mPOWER 33 · Other MEO 16.
 
 ---
