@@ -145,7 +145,6 @@ select,input[type=search]{font-size:16px}select,button{min-height:44px}
 <div class="gwrap">
 <table id="gt"><thead><tr><td>Group</td><td class="n">Active</td><td class="n">Past limit</td></tr></thead><tbody id="gtb"></tbody></table>
 <div class="gside">
-<div class="grp"><label class="lab" for="q">Find a satellite</label><input id="q" type="search" placeholder="ISS (ZARYA)" autocomplete="off"><div id="qO" class="note"></div></div>
 <p class="note" id="src">Loading satellite catalogue…</p>
 </div>
 </div>
@@ -476,7 +475,7 @@ GROUPS.forEach((g,i)=>{const c=$('gb'+i);if(!c)return;const b=bad[g]||0;c.textCo
 {let fk=0,bk=0;const pr=promptR();for(const s of S){if(s.dist<pr)fk++;else if(s.dose>thr)bk++;}$('hudF').textContent=fk.toLocaleString();$('hudB').textContent=bk.toLocaleString();$('hudT').textContent='of all '+S.length.toLocaleString()+' active satellites';const n=Math.max(1,S.length),a=100*fk/n,c=100*(fk+bk)/n;$('pie').style.background='conic-gradient(#fff4e0 0 '+a.toFixed(2)+'%,#ff4a3d '+a.toFixed(2)+'% '+c.toFixed(2)+'%,rgba(143,240,200,.35) '+c.toFixed(2)+'% 100%)';const ra=Math.round(a),rc=Math.round(c);$('pieT').innerHTML='<b>'+rc+'%</b> of all satellites lost';$('pie').setAttribute('aria-label',ra+'% of satellites killed by the flash, '+(rc-ra)+'% by the radiation belt, '+(100-rc)+'% still working');}
 $('gT').textContent=T.toLocaleString();drawHist();$('gB').textContent=B.toLocaleString();
 $('s3O').textContent=fmtK(iss);$('s4O').textContent=fmtK(css);
-if(sel)$('qO').textContent=sel.name+' ('+sel.own+'): '+sel.per+'–'+sel.apo+' km, '+(sel.inc/Math.PI*180).toFixed(1)+'°. Dose '+fmtK(sel.dose)+' of '+fmtK(thr)+' limit'+(sel.dist<promptR()?', destroyed by the initial flash ('+Math.round(sel.dist)+' km away).':sel.dose>thr?', past the threshold.':'.');}
+}
 const lb1=$('lb1'),lb2=$('lb2');const saaLocal=new THREE.Vector3(...P_.geo(-26,-50,1.0));const v=new THREE.Vector3(),n=new THREE.Vector3();
 function place(el,localPt){v.copy(localPt);earth.localToWorld(v);n.copy(v).normalize();const cd=camera.position.clone().sub(v).normalize();
 if(n.dot(cd)<0.05){el.style.display='none';return;}v.project(camera);el.style.display='';el.style.left=((v.x+1)/2*fig.clientWidth)+'px';el.style.top=((1-v.y)/2*fig.clientHeight)+'px';}
@@ -523,8 +522,6 @@ $('thrS').addEventListener('change',e=>{thr=1000*(+e.target.value);updPrompt();i
 $('srcS').addEventListener('change',e=>{srcK=e.target.value;detonate();});
 $('calS').addEventListener('change',e=>{const f=+e.target.value;for(const s of S)s.dose*=f/cal;cal=f;if(P.length)stats();});
 $('yld').addEventListener('change',e=>{cfg.Y=+e.target.value;detonate();});
-$('q').addEventListener('input',e=>{const q=e.target.value.trim().toUpperCase();if(q.length<2){sel=null;hi.visible=false;$('qO').textContent='';return;}
-sel=S.find(s=>s.name===q)||S.find(s=>s.name&&s.name.startsWith(q))||S.find(s=>s.name&&s.name.includes(q))||S.find(s=>s.id===q)||null;hi.visible=!!sel;if(!sel)$('qO').textContent='No active satellite matches “'+e.target.value+'”.';else stats();});
 syncOut();resize();detonate();requestAnimationFrame(frame);
 }
 </script>
