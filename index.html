@@ -261,7 +261,7 @@ const isMob=window.matchMedia&&matchMedia('(max-width: 900px), (pointer: coarse)
 renderer.setPixelRatio(Math.min(isMob?1.5:2,window.devicePixelRatio||1));
 const scene=new THREE.Scene();
 const camera=new THREE.PerspectiveCamera(40,1,0.01,200);
-camera.position.set(2.2,1.6,3.6);
+camera.position.set(...P_.geo(21,-105,4.51)); // default view: North America centred, Johnston Island (Starfish site) on the western limb
 const controls=new THREE.OrbitControls(camera,cv);
 controls.enableDamping=true;controls.minDistance=1.4;controls.maxDistance=30;
 scene.add(new THREE.AmbientLight(0xffffff,0.55));
