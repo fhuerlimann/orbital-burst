@@ -38,7 +38,6 @@ h1{font-family:var(--f-display);font-stretch:72%;font-weight:800;font-size:clamp
 .left{display:flex;flex-direction:column}
 .pb{background:var(--panel);border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
 .pb .ph{margin:0;padding:0;border:0;flex:none}
-.pbb{display:flex;gap:8px}.pbb button{min-width:120px}
 .pbs{display:flex;align-items:center;gap:10px}.pbs .lab{flex:none}
 .pbc{display:flex;flex-wrap:wrap;gap:6px 16px}
 aside{background:var(--panel);border-left:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:12px}
@@ -72,7 +71,7 @@ input[type=search]{font:14px var(--f-mono);letter-spacing:.1em;color:var(--ink);
 .fab{display:none;position:absolute;right:12px;bottom:12px;background:var(--acc);border-color:var(--acc);color:#1a0d05;min-height:44px;padding:0 16px;box-shadow:0 2px 10px rgba(0,0,0,.5)}
 @media(max-width:900px){.fab{display:block}.fig{height:62svh;min-height:360px;touch-action:none}}
 @media(max-width:600px){
-.pb{padding:12px 14px}.pbb,.pbs{flex-basis:100%}.pbb button{flex:1}.pbs select{flex:1}
+.pb{padding:12px 14px}.pbs{flex-basis:100%}.pbs select{flex:1}
 .top{padding:14px 14px 12px}.top p{font-size:15px}
 select,input[type=search]{font-size:16px}select,button{min-height:44px}
 .clock,.hud{top:6px;padding:6px 8px}.clock b,.hud b{font-size:19px}.hud{gap:2px 14px}.hud small{display:none}
@@ -96,19 +95,18 @@ aside{padding:14px}.stats{gap:6px}.st div:last-child{font-size:18px}
 <div id="bflash" style="position:absolute;inset:0;pointer-events:none;opacity:0"></div>
 <button class="fab" id="go2" aria-label="Detonate again">Detonate</button>
 <div class="lbl" id="lb1">Burst</div>
-<div class="lbl" id="lb2">South Atlantic Anomaly</div>
+<div class="lbl" id="lb2" style="display:none">South Atlantic Anomaly</div>
 <div class="clock"><span>Time since burst</span><b id="clk">T+ 00:00:00</b></div>
 <div class="hud" aria-live="polite"><div><span>Flash kills</span><b id="hudF">0</b></div><div><span>Belt kills</span><b id="hudB">0</b></div><small id="hudT">of all active satellites</small></div>
 <div class="legend" style="display:none"><span><i class="dot" style="background:var(--pink)"></i>Trapped electrons</span><span><i class="dot" style="background:var(--mint)"></i>Satellite, healthy</span><span><i class="dot" style="background:var(--red)"></i>Past damage threshold</span></div>
 </div>
 <div class="pb" role="group" aria-labelledby="pbH">
 <h2 class="ph" id="pbH">Playback</h2>
-<div class="pbb"><button class="go" id="go">Detonate</button><button id="pp">Pause</button></div>
 <div class="pbs"><label class="lab" for="warp">Simulation speed</label>
 <select id="warp">
 <option value="1">Real time</option><option value="60" selected>1 minute per second</option><option value="600">10 minutes per second</option><option value="3600">1 hour per second</option><option value="86400">1 day per second</option><option value="604800">1 week per second</option><option value="2629800">1 month per second</option>
 </select></div>
-<div class="pbc"><label class="chk"><input type="checkbox" id="fl"> Field lines</label><label class="chk"><input type="checkbox" id="cl" checked> Density cloud</label><label class="chk"><input type="checkbox" id="gps"> Zoom out to GEO</label></div>
+<div class="pbc"><label class="chk"><input type="checkbox" id="fl"> Field lines</label><label class="chk"><input type="checkbox" id="cl" checked> Radiation belt</label><label class="chk"><input type="checkbox" id="gps"> Zoom out to GEO</label></div>
 </div>
 </div>
 <aside>
@@ -435,7 +433,7 @@ const tl=P.filter(p=>p.kind===0&&p.tb<20).map(p=>p.L).sort((a,b)=>a-b);const Lb=
 $('LO').textContent=Lb.toFixed(3);
 const pr=P_.periods(Lb,1,0.7);
 $('per').textContent='A 1 MeV electron on this shell bounces between hemispheres every '+pr.Tb.toFixed(2)+' s and drifts once around Earth every '+Math.round(P_.TAU/pr.wd/60)+' min.';
-playing=true;$('pp').textContent='Pause';}
+playing=true;}
 function step(dt){P_.buildGrid(P,t);for(const s of S){if(s.r>3)continue;s.dose+=P_.doseRate(P_.inertialToFixed(P_.satPos(s,t),t),t)*dt*cal;}}
 function stats(){let tr=0,l1=0,l2=0,born=0;for(const p of P){if(t<p.tb)continue;born++;if(P_.alive(p,t))tr++;else if(p.kind===1)l1++;else l2++;}const bn=Math.max(1,born);
 $('tO').textContent=fmtT(t);$('trO').textContent=(100*tr/bn).toFixed(1)+'%';{let pk=0;for(const s of S)if(!off.has(s.g)&&s.dist<promptR())pk++;$('pkO').textContent=pk.toLocaleString();}
@@ -474,18 +472,17 @@ if(t<86400)txt=z(Math.floor(sec/3600))+':'+z(Math.floor(sec/60)%60)+':'+z(sec%60
 else if(t<86400*100)txt=Math.floor(t/86400)+' d '+z(Math.floor(sec/3600)%24)+':'+z(Math.floor(sec/60)%60);
 else if(t<3.156e7)txt=Math.floor(t/86400)+' days';else txt=(t/3.156e7).toFixed(2)+' years';
 const c=$('clk');const v='T+ '+txt;if(c.textContent!==v)c.textContent=v;}
-place(lb1,marker.position);place(lb2,saaLocal);
+place(lb1,marker.position);
 acc+=wall;if(acc>0.2){acc=0;if(P.length)stats();}
 requestAnimationFrame(frame);}
 const syncOut=()=>{$('altO').textContent=cfg.alt+' km';$('latO').textContent=cfg.lat.toFixed(1)+'°';$('lonO').textContent=String(cfg.lon.toFixed(1)).replace('-','−')+'°';};
 $('preset').addEventListener('change',e=>{if(e.target.value==='custom')return;const [la,lo,al]=e.target.value.split(',').map(Number);cfg={lat:la,lon:lo,alt:al,Y:cfg.Y};$('lat').value=la;$('lon').value=lo;$('alt').value=al;syncOut();detonate();});
 for(const id of ['alt','lat','lon'])$(id).addEventListener('input',e=>{cfg[id]=+e.target.value;$('preset').value='custom';syncOut();});
 for(const id of ['alt','lat','lon'])$(id).addEventListener('change',()=>detonate());
-$('go').addEventListener('click',detonate);$('go2').addEventListener('click',detonate);
-$('pp').addEventListener('click',()=>{playing=!playing;$('pp').textContent=playing?'Pause':'Play';});
+$('go2').addEventListener('click',detonate);
 $('warp').addEventListener('change',e=>{warp=+e.target.value;});
 $('fl').addEventListener('change',e=>{fieldLines.visible=e.target.checked;});
-$('cl').addEventListener('change',e=>{cloud.visible=e.target.checked;pts.material.opacity=e.target.checked?0.35:0.9;if(P.length)updCloud();});
+$('cl').addEventListener('change',e=>{cloud.visible=e.target.checked;pts.visible=e.target.checked;if(P.length)updCloud();});
 $('gps').addEventListener('change',e=>{camera.position.setLength(e.target.checked?16:4.6);});
 $('gtb').addEventListener('change',e=>{const i=e.target.dataset&&e.target.dataset.g;if(i!=null)setGroup(+i,e.target.checked);});
 $('gAll').addEventListener('click',()=>GROUPS.forEach((g,i)=>setGroup(i,true)));
