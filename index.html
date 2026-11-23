@@ -26,6 +26,9 @@ h1{font-family:var(--f-display);font-stretch:72%;font-weight:800;font-size:clamp
 .ph:first-child{border-top:0;padding-top:0;margin-top:0}
 .stage{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .fig{position:relative;min-height:560px;height:72vh;background:#05070b;color:#e2e8ed}
+#fadein{position:absolute;inset:0;background:#000;pointer-events:none;animation:fadeinFallback 1s 6s forwards}
+#fadein.in{opacity:0;transition:opacity 2.2s ease-out;animation:none}
+@keyframes fadeinFallback{to{opacity:0;visibility:hidden}}
 .fig canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
 .lbl{position:absolute;font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:#e2e8ed;background:rgba(5,7,11,.7);padding:3px 7px;border-radius:4px;pointer-events:none;white-space:nowrap;transform:translate(8px,-50%)}
 .clock,.hud{position:absolute;top:12px;text-shadow:0 1px 3px #000,0 0 8px #000;padding:8px 12px;pointer-events:none}
@@ -91,7 +94,7 @@ select,input[type=search]{font-size:16px}select,button{min-height:44px}
 .lbl{font-size:10px}
 #hist{height:220px!important}
 .prose ul{padding-left:18px}}
-@media(prefers-reduced-motion:reduce){.lbl{transition:none}}
+@media(prefers-reduced-motion:reduce){#fadein.in{transition-duration:.4s}.lbl{transition:none}}
 </style>
 </head>
 <body>
@@ -103,6 +106,7 @@ select,input[type=search]{font-size:16px}select,button{min-height:44px}
 <div class="left">
 <div class="fig" id="fig">
 <canvas id="cv" aria-label="3D view of Earth, magnetic field lines, trapped electrons and satellite orbits"></canvas>
+<div id="fadein" aria-hidden="true"></div>
 <div id="bflash" style="position:absolute;inset:0;pointer-events:none;opacity:0"></div>
 <button class="fab" id="go2" aria-label="Detonate again">Detonate</button>
 <div class="lbl" id="lb1">Burst</div>
@@ -484,6 +488,7 @@ function resize(){const w=fig.clientWidth,h=fig.clientHeight;renderer.setSize(w,
 const ro=new ResizeObserver(resize);ro.observe(fig);
 let last=performance.now(),acc=0;
 let stepAcc=0,stepWall=0;
+let fadeEl=$('fadein');
 function frame(now){const wall=Math.min(0.1,(now-last)/1000);last=now;
 if(playing&&P.length){const dt=wall*warp;t+=dt;stepAcc+=dt;stepWall+=wall;if(!isMob||stepWall>=1/30){step(stepAcc);stepAcc=0;stepWall=0;}}
 earth.rotation.y=P_.OMEGA_E*t;
@@ -498,7 +503,7 @@ if(off.has(s.g)){sPos[i*3]=sPos[i*3+1]=sPos[i*3+2]=0;continue;}const f=Math.min(
 if(sel){const p=P_.satPos(sel,t);hiGeo.attributes.position.setXYZ(0,p[0],p[1],p[2]);hiGeo.attributes.position.needsUpdate=true;}
 sGeo.attributes.position.needsUpdate=true;sGeo.attributes.color.needsUpdate=true;
 updFx(wall);
-controls.update();renderer.render(scene,camera);
+controls.update();renderer.render(scene,camera);if(fadeEl){const f=fadeEl;fadeEl=null;requestAnimationFrame(()=>{f.classList.add('in');f.addEventListener('transitionend',()=>f.remove(),{once:true});});}
 {const z=n=>String(n).padStart(2,'0');const sec=Math.floor(t);let txt;
 if(t<86400)txt=z(Math.floor(sec/3600))+':'+z(Math.floor(sec/60)%60)+':'+z(sec%60);
 else if(t<86400*100)txt=Math.floor(t/86400)+' d '+z(Math.floor(sec/3600)%24)+':'+z(Math.floor(sec/60)%60);
