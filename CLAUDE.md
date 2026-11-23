@@ -119,7 +119,7 @@ Units: distances in Earth radii (RE = 6371 km) unless noted, time in seconds. Co
 **Hierarchy:**
 - **h1:** Archivo, stretch 72%, weight 800, `clamp(28px, 4.2vw, 44px)`, line-height 1. **Sentence case** ("One nuclear blast vs. 17,000 satellites"). The user rejected all caps and Frutiger.
 - **Subtitle** (`.top p`): Archivo 16px, 400, muted, max 72ch. The user rejected mono for it.
-- **Side-panel section headings** (`.ph`): Archivo, stretch 85%, 700, 11px, uppercase, 0.12em tracking, muted, with a top rule. Sections: Scenario, Playback, Status, Damage model.
+- **Side-panel section headings** (`.ph`): Archivo, stretch 85%, 700, 11px, uppercase, 0.12em tracking, muted, with a top rule. Side-panel sections: Scenario, Status, Damage model. (Playback is in the bar under the scene.)
 - **Labels** (`.lab`, stat-tile labels, table headers, HUD labels, scene labels): Archivo 10.5px, 600, uppercase, 0.07–0.08em tracking, muted.
 - **Buttons:** Archivo 11px, 700, uppercase, 0.08em tracking. Primary (Detonate) uses the accent background.
 - **Large values:** IBM Plex Mono 21px, 500, tabular (stat tiles). HUD counters and clock: Plex Mono 26px (19px on phones).
@@ -132,7 +132,8 @@ Units: distances in Earth radii (RE = 6371 km) unless noted, time in seconds. Co
 - **Approved exceptions:** the 3D stage is always dark (#05070b), including in light mode. Scene colours are independent of the theme: electrons and cloud **pink #ff4f8b**, healthy satellites **mint #8ff0c8**, failed satellites **red #ff4a3d** (histogram bars use the same mint and red). Flash kills in the HUD are warm white #fff4e0.
 
 **Layout and approved UI decisions:**
-- Header (h1 and subtitle), then the stage grid (3D scene, plus a 340px side panel on the right), then the histogram band, then the methods band.
+- Header (h1 and subtitle), then the stage grid (3D scene, plus a 340px side panel on the right), then the histogram band, then the methods band
+- **Playback bar** (`.pb`, user request): directly under the 3D scene, inside the left column (`.left`). It holds Detonate, Pause, Simulation speed and the Field lines / Density cloud / Zoom out to GEO checkboxes. Density cloud is checked by default and toggles the cloud.
 - **HUD and clock have no background panels.** They use a text shadow only (user request).
 - **The colour legend is hidden** (`style="display:none"`); keep it in the DOM.
 - Mobile (≤900px or coarse pointer): stacked layout, scene 58–62svh, `touch-action:none` on the scene, a floating Detonate button, pixel ratio ≤1.5, CK=12, dose steps ≤30 Hz. At ≤600px: 16px form text, 44px targets, smaller HUD, "of all…" line hidden.

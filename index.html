@@ -11,7 +11,7 @@
    IDEA: a mission-control orbital display of a physics run
    PICTURE: the rotating Earth with a pink electron shell and satellite swarms
    COLOUR and TYPE: dark slate panels with an orange accent; Archivo for words (width axis sets hierarchy), IBM Plex Mono for every number
-   LAYOUT: big 3D stage left, instrument panel right, histogram and method notes below */
+   LAYOUT: big 3D stage left with the playback bar under it, instrument panel right, histogram and method notes below */
 :root{color-scheme:dark;--bg:#0c1217;--panel:#131b22;--ink:#e2e8ed;--mut:#8b99a5;--line:#26323c;--acc:#ff8a4c;--acc2:#6fb4ff;--pink:#ff4f8b;--mint:#8ff0c8;--red:#ff4a3d;--ctl:#0c1217;
 --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;--f-body:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
 :root[data-theme=light]{color-scheme:light;--bg:#e9edf1;--panel:#f8fafb;--ink:#111b24;--mut:#56636f;--line:#cfd7df;--acc:#c2410c;--acc2:#1d5fa8;--red:#c81e1e;--ctl:#ffffff}
@@ -35,6 +35,12 @@ h1{font-family:var(--f-display);font-stretch:72%;font-weight:800;font-size:clamp
 #hudF{color:#fff4e0}#hudB{color:#ff4a3d}.hud small{flex-basis:100%;font:11px var(--f-mono);color:#8b99a5}
 .legend{position:absolute;left:12px;bottom:12px;font-size:12px;color:#8b99a5;display:flex;gap:14px;flex-wrap:wrap}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0}
+.left{display:flex;flex-direction:column}
+.pb{background:var(--panel);border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
+.pb .ph{margin:0;padding:0;border:0;flex:none}
+.pbb{display:flex;gap:8px}.pbb button{min-width:120px}
+.pbs{display:flex;align-items:center;gap:10px}.pbs .lab{flex:none}
+.pbc{display:flex;flex-wrap:wrap;gap:6px 16px}
 aside{background:var(--panel);border-left:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:12px}
 .grp{display:flex;flex-direction:column;gap:6px}
 .lab{font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:var(--mut);display:flex;justify-content:space-between;align-items:baseline}
@@ -66,6 +72,7 @@ input[type=search]{font:14px var(--f-mono);letter-spacing:.1em;color:var(--ink);
 .fab{display:none;position:absolute;right:12px;bottom:12px;background:var(--acc);border-color:var(--acc);color:#1a0d05;min-height:44px;padding:0 16px;box-shadow:0 2px 10px rgba(0,0,0,.5)}
 @media(max-width:900px){.fab{display:block}.fig{height:62svh;min-height:360px;touch-action:none}}
 @media(max-width:600px){
+.pb{padding:12px 14px}.pbb,.pbs{flex-basis:100%}.pbb button{flex:1}.pbs select{flex:1}
 .top{padding:14px 14px 12px}.top p{font-size:15px}
 select,input[type=search]{font-size:16px}select,button{min-height:44px}
 .clock,.hud{top:6px;padding:6px 8px}.clock b,.hud b{font-size:19px}.hud{gap:2px 14px}.hud small{display:none}
@@ -83,6 +90,7 @@ aside{padding:14px}.stats{gap:6px}.st div:last-child{font-size:18px}
 <p>A nuclear explosion in space traps its electrons in Earth’s magnetic field, forming an artificial radiation belt that wraps the planet within an hour and destroys satellites for months. Pick a site and yield, then watch it happen with the real catalogue of 17,405 active satellites.</p>
 </header>
 <section class="stage">
+<div class="left">
 <div class="fig" id="fig">
 <canvas id="cv" aria-label="3D view of Earth, magnetic field lines, trapped electrons and satellite orbits"></canvas>
 <div id="bflash" style="position:absolute;inset:0;pointer-events:none;opacity:0"></div>
@@ -92,6 +100,16 @@ aside{padding:14px}.stats{gap:6px}.st div:last-child{font-size:18px}
 <div class="clock"><span>Time since burst</span><b id="clk">T+ 00:00:00</b></div>
 <div class="hud" aria-live="polite"><div><span>Flash kills</span><b id="hudF">0</b></div><div><span>Belt kills</span><b id="hudB">0</b></div><small id="hudT">of all active satellites</small></div>
 <div class="legend" style="display:none"><span><i class="dot" style="background:var(--pink)"></i>Trapped electrons</span><span><i class="dot" style="background:var(--mint)"></i>Satellite, healthy</span><span><i class="dot" style="background:var(--red)"></i>Past damage threshold</span></div>
+</div>
+<div class="pb" role="group" aria-labelledby="pbH">
+<h2 class="ph" id="pbH">Playback</h2>
+<div class="pbb"><button class="go" id="go">Detonate</button><button id="pp">Pause</button></div>
+<div class="pbs"><label class="lab" for="warp">Simulation speed</label>
+<select id="warp">
+<option value="1">Real time</option><option value="60" selected>1 minute per second</option><option value="600">10 minutes per second</option><option value="3600">1 hour per second</option><option value="86400">1 day per second</option><option value="604800">1 week per second</option><option value="2629800">1 month per second</option>
+</select></div>
+<div class="pbc"><label class="chk"><input type="checkbox" id="fl"> Field lines</label><label class="chk"><input type="checkbox" id="cl" checked> Density cloud</label><label class="chk"><input type="checkbox" id="gps"> Zoom out to GEO</label></div>
+</div>
 </div>
 <aside>
 <h2 class="ph">Scenario</h2>
@@ -108,13 +126,6 @@ aside{padding:14px}.stats{gap:6px}.st div:last-child{font-size:18px}
 <div class="grp"><div class="lab"><label for="alt">Altitude</label><b id="altO">400 km</b></div><input type="range" id="alt" min="100" max="2000" step="10" value="400"></div>
 <div class="grp"><div class="lab"><label for="lat">Latitude</label><b id="latO">16.7°</b></div><input type="range" id="lat" min="-60" max="60" step="0.1" value="16.7"></div>
 <div class="grp"><div class="lab"><label for="lon">Longitude</label><b id="lonO">−169.5°</b></div><input type="range" id="lon" min="-180" max="180" step="0.5" value="-169.5"></div>
-<h2 class="ph">Playback</h2>
-<div class="row"><button class="go" id="go">Detonate</button><button id="pp">Pause</button></div>
-<div class="grp"><label class="lab" for="warp">Simulation speed</label>
-<select id="warp">
-<option value="1">Real time</option><option value="60" selected>1 minute per second</option><option value="600">10 minutes per second</option><option value="3600">1 hour per second</option><option value="86400">1 day per second</option><option value="604800">1 week per second</option><option value="2629800">1 month per second</option>
-</select></div>
-<div class="row"><label class="chk"><input type="checkbox" id="fl"> Field lines</label><label class="chk"><input type="checkbox" id="cl" checked> Density cloud</label><label class="chk"><input type="checkbox" id="gps"> Zoom out to GEO</label></div>
 <h2 class="ph">Status</h2>
 <div class="stats">
 <div class="st wide"><div>Time since burst</div><div id="tO">0 s</div></div>
