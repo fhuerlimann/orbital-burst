@@ -84,7 +84,7 @@ Units: distances in Earth radii (RE = 6371 km) unless noted, time in seconds. Co
   - `promptR() = √(0.7·Y·4.184e15 / (4π·F))/1000` km, with `F = 40 J/m²·max(1, thr/40 krad)`.
   - `s.dist` is computed at detonation: the distance from burst to satellite at t=0, or ∞ if the line of sight passes below 100 km altitude.
   - `isDead(s) = s.dose > thr || s.dist < promptR()`.
-- **UI:** group table with a checkbox per group (`off` set; hidden groups still accumulate dose), All/None buttons, satellite search (highlight point), stats tiles, histogram (SVG, log x from 0.1 to 100,000 krad, 60 bins, dashed lines at 10/40/120/300 krad, the selected one solid in the accent colour, red bars past the threshold), HUD (Flash kills / Belt kills, counted over **all** satellites whatever the group toggles; belt kills exclude flash kills), clock (`T+ hh:mm:ss` → `d hh:mm` → days → years), a Burst label projected onto the globe (hidden when on the far side; the SAA label is permanently hidden), and a mobile Detonate button (`.fab`) on the scene.
+- **UI:** group table with a checkbox per group (`off` set; hidden groups still accumulate dose), All/None buttons, satellite search (highlight point), stats tiles, histogram (SVG, log x from 0.1 to 100,000 krad, 60 bins, dashed lines at 10/40/120/300 krad, the selected one solid in the accent colour, red bars past the threshold), HUD (Flash kills / Radiation belt kills, counted over **all** satellites whatever the group toggles; belt kills exclude flash kills; below them a pie chart `#pie` (CSS conic-gradient: flash kills warm white #fff4e0, belt kills red #ff4a3d, survivors translucent mint) with the caption "N% of all satellites lost", user request), clock (`T+ hh:mm:ss` → `d hh:mm` → days → years), a Burst label projected onto the globe (hidden when on the far side; the SAA label is permanently hidden), and a mobile Detonate button (`.fab`) on the scene.
 - **Time warp options:** real time, 1 min/s (default), 10 min/s, 1 h/s, 1 day/s, 1 week/s, 1 month/s. Wall dt is capped at 0.1 s per frame.
 
 ---
@@ -119,7 +119,7 @@ Units: distances in Earth radii (RE = 6371 km) unless noted, time in seconds. Co
 **Hierarchy:**
 - **h1:** Archivo, stretch 72%, weight 800, `clamp(28px, 4.2vw, 44px)`, line-height 1. **Sentence case** ("One nuclear blast vs. 17,000 satellites"). The user rejected all caps and Frutiger.
 - **Subtitle** (`.top p`): Archivo 16px, 400, muted, max 72ch. The user rejected mono for it.
-- **Side-panel section headings** (`.ph`): Archivo, stretch 85%, 700, 11px, uppercase, 0.12em tracking, muted, with a top rule. Side-panel sections: Scenario, Status, Damage model. (Playback is in the bar under the scene.)
+- **Side-panel section headings** (`.ph`): Archivo, stretch 85%, 700, 11px, uppercase, 0.12em tracking, muted, with a top rule. Side-panel sections: Scenario, Status, Damage model. (The playback controls are in the bar under the scene, without a heading.)
 - **Labels** (`.lab`, stat-tile labels, table headers, HUD labels, scene labels): Archivo 10.5px, 600, uppercase, 0.07–0.08em tracking, muted.
 - **Buttons:** Archivo 11px, 700, uppercase, 0.08em tracking. Primary (Detonate) uses the accent background.
 - **Large values:** IBM Plex Mono 21px, 500, tabular (stat tiles). HUD counters and clock: Plex Mono 26px (19px on phones).
@@ -133,9 +133,9 @@ Units: distances in Earth radii (RE = 6371 km) unless noted, time in seconds. Co
 
 **Layout and approved UI decisions:**
 - Header (h1 and subtitle), then the stage grid (3D scene, plus a 340px side panel on the right), then the histogram band, then the methods band.
-- **Playback bar** (`.pb`, user request): directly under the 3D scene, inside the left column (`.left`). It holds Simulation speed and the Field lines / Radiation belt / Zoom out to GEO checkboxes (no Detonate or Pause buttons, user request; re-detonation happens via the mobile `.fab` or by changing a scenario control). "Radiation belt" (`#cl`, formerly "Density cloud") is checked by default; unchecking it hides the density cloud **and** all electron points.
+- **Playback bar** (`.pb`, user request): directly under the 3D scene, inside the left column (`.left`). It has no heading and holds Simulation speed and the Field lines / Radiation belt / Satellites checkboxes (no Detonate or Pause buttons and no "Zoom out to GEO", user request; re-detonation happens via the mobile `.fab` or by changing a scenario control). "Radiation belt" (`#cl`, formerly "Density cloud") is checked by default; unchecking it hides the density cloud **and** all electron points. "Satellites" (`#sv`) is checked by default and toggles `satG`, the group holding the satellite points and the search highlight.
 - **HUD and clock have no background panels.** They use a text shadow only (user request).
-- **The colour legend is hidden** (`style="display:none"`); keep it in the DOM.
+- **Colour legend** (`.legend`, bottom left of the scene, user request): "Satellite" mint #8ff0c8 and "Killed satellite" red #ff4a3d, stacked, label style with text shadow and no panel. (It used to be hidden and also listed trapped electrons.)
 - **The "South Atlantic Anomaly" scene label (`#lb2`) is hidden** (`style="display:none"`, and it is no longer positioned each frame); keep it in the DOM (user request).
 - Mobile (≤900px or coarse pointer): stacked layout, scene 58–62svh, `touch-action:none` on the scene, a floating Detonate button, pixel ratio ≤1.5, CK=12, dose steps ≤30 Hz. At ≤600px: 16px form text, 44px targets, smaller HUD, "of all…" line hidden.
 - The page's head `<style>` starts with the five-line design comment (VOICE / IDEA / PICTURE / COLOUR and TYPE / LAYOUT). Keep it updated.
@@ -148,7 +148,7 @@ Units: distances in Earth radii (RE = 6371 km) unless noted, time in seconds. Co
 - Yield options: 10 kt, 100 kt, 1 Mt, **1.4 Mt (Starfish Prime), the default**, 10 Mt.
 - Altitude slider 100–2000 km (2000 km matches Cosmos 2553's orbit), latitude −60…60, longitude −180…180. Changing any of them re-detonates.
 - Threshold **40 krad(Si)** (options 10 / 40 / 120 / 300). Electron source **Central**. Dose model **calibrated (0.15)**.
-- **Radiation belt (density cloud + electrons) on, field lines off, all satellite groups visible**, "Zoom out to GEO" off.
+- **Radiation belt (density cloud + electrons) on, field lines off, all satellite groups visible**, satellites shown.
 - Camera: looks at 21°N 105°W from 4.51 RE (North America centred, the Starfish burst over Johnston visible on the western limb). User-requested.
 - Speed: 1 minute per second. The page auto-detonates on load, and again once sats.json has loaded.
 - Satellite groups (the order in `GROUPS` must match build_sats.py): Starlink 11,199 · Other LEO 3,682 · OneWeb 651 · GEO and high orbits 593 · Qianfan / Guowang 545 · Kuiper 391 · Navigation (GPS, GLONASS, Galileo, BeiDou) 160 · Iridium 80 · Highly elliptical 55 · O3b / mPOWER 33 · Other MEO 16.

@@ -32,12 +32,14 @@ h1{font-family:var(--f-display);font-stretch:72%;font-weight:800;font-size:clamp
 .hud{left:12px;display:flex;flex-wrap:wrap;gap:4px 22px;align-items:flex-end}.hud div{display:flex;flex-direction:column}
 .clock span,.hud span{font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:#8b99a5}
 .clock b,.hud b{font:500 26px/1.15 var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
-#hudF{color:#fff4e0}#hudB{color:#ff4a3d}.hud small{flex-basis:100%;font:11px var(--f-mono);color:#8b99a5}
-.legend{position:absolute;left:12px;bottom:12px;font-size:12px;color:#8b99a5;display:flex;gap:14px;flex-wrap:wrap}
+#hudF{color:#fff4e0}#hudB{color:#ff4a3d}
+.hud .pieW{flex-basis:100%;flex-direction:row;align-items:center;gap:10px;margin-top:6px}
+.pie{display:block;width:56px;height:56px;border-radius:50%;flex:none;background:conic-gradient(rgba(143,240,200,.35) 0 100%);box-shadow:0 0 0 1px rgba(226,232,237,.25),0 1px 6px #000}
+.pieW em{font:normal 11px/1.4 var(--f-mono);color:#8b99a5;max-width:16ch}.pieW em b{font:500 13px var(--f-mono);color:#e2e8ed}.hud small{flex-basis:100%;font:11px var(--f-mono);color:#8b99a5}
+.legend{position:absolute;left:12px;bottom:12px;padding:8px 12px;font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:#c4ced6;display:flex;flex-direction:column;gap:5px;pointer-events:none;text-shadow:0 1px 3px #000,0 0 8px #000}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0}
 .left{display:flex;flex-direction:column}
 .pb{background:var(--panel);border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
-.pb .ph{margin:0;padding:0;border:0;flex:none}
 .pbs{display:flex;align-items:center;gap:10px}.pbs .lab{flex:none}
 .pbc{display:flex;flex-wrap:wrap;gap:6px 16px}
 aside{background:var(--panel);border-left:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:12px}
@@ -74,7 +76,7 @@ input[type=search]{font:14px var(--f-mono);letter-spacing:.1em;color:var(--ink);
 .pb{padding:12px 14px}.pbs{flex-basis:100%}.pbs select{flex:1}
 .top{padding:14px 14px 12px}.top p{font-size:15px}
 select,input[type=search]{font-size:16px}select,button{min-height:44px}
-.clock,.hud{top:6px;padding:6px 8px}.clock b,.hud b{font-size:19px}.hud{gap:2px 14px}.hud small{display:none}
+.clock,.hud{top:6px;padding:6px 8px}.clock b,.hud b{font-size:19px}.hud{gap:2px 14px}.hud small{display:none}.legend{bottom:6px;left:6px;padding:6px 8px}.pie{width:40px;height:40px}.hud .pieW{margin-top:2px}
 .fig{height:58svh;min-height:330px}
 aside{padding:14px}.stats{gap:6px}.st div:last-child{font-size:18px}
 .lbl{font-size:10px}
@@ -97,16 +99,15 @@ aside{padding:14px}.stats{gap:6px}.st div:last-child{font-size:18px}
 <div class="lbl" id="lb1">Burst</div>
 <div class="lbl" id="lb2" style="display:none">South Atlantic Anomaly</div>
 <div class="clock"><span>Time since burst</span><b id="clk">T+ 00:00:00</b></div>
-<div class="hud" aria-live="polite"><div><span>Flash kills</span><b id="hudF">0</b></div><div><span>Belt kills</span><b id="hudB">0</b></div><small id="hudT">of all active satellites</small></div>
-<div class="legend" style="display:none"><span><i class="dot" style="background:var(--pink)"></i>Trapped electrons</span><span><i class="dot" style="background:var(--mint)"></i>Satellite, healthy</span><span><i class="dot" style="background:var(--red)"></i>Past damage threshold</span></div>
+<div class="hud" aria-live="polite"><div><span>Flash kills</span><b id="hudF">0</b></div><div><span>Radiation belt kills</span><b id="hudB">0</b></div><small id="hudT">of all active satellites</small><div class="pieW"><i class="pie" id="pie" role="img" aria-label="Share of all satellites killed"></i><em id="pieT">0% of all satellites lost</em></div></div>
+<div class="legend" aria-label="Legend"><span><i class="dot" style="background:#8ff0c8"></i>Satellite</span><span><i class="dot" style="background:#ff4a3d"></i>Killed satellite</span></div>
 </div>
-<div class="pb" role="group" aria-labelledby="pbH">
-<h2 class="ph" id="pbH">Playback</h2>
+<div class="pb" role="group" aria-label="Playback">
 <div class="pbs"><label class="lab" for="warp">Simulation speed</label>
 <select id="warp">
 <option value="1">Real time</option><option value="60" selected>1 minute per second</option><option value="600">10 minutes per second</option><option value="3600">1 hour per second</option><option value="86400">1 day per second</option><option value="604800">1 week per second</option><option value="2629800">1 month per second</option>
 </select></div>
-<div class="pbc"><label class="chk"><input type="checkbox" id="fl"> Field lines</label><label class="chk"><input type="checkbox" id="cl" checked> Radiation belt</label><label class="chk"><input type="checkbox" id="gps"> Zoom out to GEO</label></div>
+<div class="pbc"><label class="chk"><input type="checkbox" id="fl"> Field lines</label><label class="chk"><input type="checkbox" id="cl" checked> Radiation belt</label><label class="chk"><input type="checkbox" id="sv" checked> Satellites</label></div>
 </div>
 </div>
 <aside>
@@ -327,7 +328,7 @@ const promptR=()=>{const F=40*Math.max(1,thr/4e4);return Math.sqrt(0.7*cfg.Y*4.1
 const isDead=s=>s.dose>thr||s.dist<promptR();
 let S=P_.makeSats(),sPos,sCol,thr=4e4,sel=null;
 const sGeo=new THREE.BufferGeometry();
-const sats=new THREE.Points(sGeo,new THREE.PointsMaterial({size:0.011,vertexColors:true}));scene.add(sats);
+const sats=new THREE.Points(sGeo,new THREE.PointsMaterial({size:0.011,vertexColors:true}));const satG=new THREE.Group();scene.add(satG);satG.add(sats);
 const hs=$('hs');
 function drawHist(){const W=hs.clientWidth,H=hs.clientHeight;if(!W)return;
 const m={l:48,r:14,t:26,b:40},iw=W-m.l-m.r,ih=H-m.t-m.b,X0=-1,X1=5,NB=60;
@@ -357,7 +358,7 @@ function setSats(list){S=list;sPos=new Float32Array(S.length*3);sCol=new Float32
 sGeo.setAttribute('position',new THREE.BufferAttribute(sPos,3));sGeo.setAttribute('color',new THREE.BufferAttribute(sCol,3));sGeo.setDrawRange(0,S.length);buildTable();}
 setSats(S);
 const hiGeo=new THREE.BufferGeometry();hiGeo.setAttribute('position',new THREE.BufferAttribute(new Float32Array(3),3));
-const hi=new THREE.Points(hiGeo,new THREE.PointsMaterial({size:0.05,color:0xffffff}));hi.visible=false;scene.add(hi);
+const hi=new THREE.Points(hiGeo,new THREE.PointsMaterial({size:0.05,color:0xffffff}));hi.visible=false;satG.add(hi);
 fetch('sats.json').then(r=>r.json()).then(rows=>{const L=P_.makeSatsFromData(rows);setSats(L);detonate();$('src').textContent='Satellites: '+L.length.toLocaleString()+' active objects from CelesTrak’s catalogue, 20 Nov 2026.';}).catch(()=>{$('src').textContent='Satellite catalogue could not load, so generic example shells are shown.';});
 const marker=new THREE.Mesh(new THREE.SphereGeometry(0.015,12,8),new THREE.MeshBasicMaterial({color:0xffd0de}));earth.add(marker);
 const promptSph=new THREE.Mesh(new THREE.SphereGeometry(1,32,20),new THREE.MeshBasicMaterial({color:0xffd0de,transparent:true,opacity:0.07,depthWrite:false}));earth.add(promptSph);
@@ -441,7 +442,7 @@ $('l1O').textContent=(100*l1/bn).toFixed(1)+'%';$('l2O').textContent=(100*l2/bn)
 const tot={},bad={};let iss=0,css=0,T=0,B=0;
 for(const s of S){tot[s.g]=(tot[s.g]||0)+1;if(isDead(s))bad[s.g]=(bad[s.g]||0)+1;if(s.name==='ISS (ZARYA)')iss=s.dose;if(s.name==='CSS (TIANHE)')css=s.dose;}
 GROUPS.forEach((g,i)=>{const c=$('gb'+i);if(!c)return;const b=bad[g]||0;c.textContent=b.toLocaleString()+(b?' ('+Math.round(100*b/tot[g])+'%)':'');c.style.color=b&&!off.has(g)?'var(--red)':'';if(!off.has(g)){T+=tot[g]||0;B+=b;}});
-{let fk=0,bk=0;const pr=promptR();for(const s of S){if(s.dist<pr)fk++;else if(s.dose>thr)bk++;}$('hudF').textContent=fk.toLocaleString();$('hudB').textContent=bk.toLocaleString();$('hudT').textContent='of all '+S.length.toLocaleString()+' active satellites';}
+{let fk=0,bk=0;const pr=promptR();for(const s of S){if(s.dist<pr)fk++;else if(s.dose>thr)bk++;}$('hudF').textContent=fk.toLocaleString();$('hudB').textContent=bk.toLocaleString();$('hudT').textContent='of all '+S.length.toLocaleString()+' active satellites';const n=Math.max(1,S.length),a=100*fk/n,c=100*(fk+bk)/n;$('pie').style.background='conic-gradient(#fff4e0 0 '+a.toFixed(2)+'%,#ff4a3d '+a.toFixed(2)+'% '+c.toFixed(2)+'%,rgba(143,240,200,.35) '+c.toFixed(2)+'% 100%)';const ra=Math.round(a),rc=Math.round(c);$('pieT').innerHTML='<b>'+rc+'%</b> of all satellites lost';$('pie').setAttribute('aria-label',ra+'% of satellites killed by the flash, '+(rc-ra)+'% by the radiation belt, '+(100-rc)+'% still working');}
 $('gT').textContent=T.toLocaleString();drawHist();$('gB').textContent=B.toLocaleString();
 $('s3O').textContent=fmtK(iss);$('s4O').textContent=fmtK(css);
 if(sel)$('qO').textContent=sel.name+' ('+sel.own+'): '+sel.per+'–'+sel.apo+' km, '+(sel.inc/Math.PI*180).toFixed(1)+'°. Dose '+fmtK(sel.dose)+' of '+fmtK(thr)+' limit'+(sel.dist<promptR()?', destroyed by the initial flash ('+Math.round(sel.dist)+' km away).':sel.dose>thr?', past the threshold.':'.');}
@@ -483,7 +484,7 @@ $('go2').addEventListener('click',detonate);
 $('warp').addEventListener('change',e=>{warp=+e.target.value;});
 $('fl').addEventListener('change',e=>{fieldLines.visible=e.target.checked;});
 $('cl').addEventListener('change',e=>{cloud.visible=e.target.checked;pts.visible=e.target.checked;if(P.length)updCloud();});
-$('gps').addEventListener('change',e=>{camera.position.setLength(e.target.checked?16:4.6);});
+$('sv').addEventListener('change',e=>{satG.visible=e.target.checked;});
 $('gtb').addEventListener('change',e=>{const i=e.target.dataset&&e.target.dataset.g;if(i!=null)setGroup(+i,e.target.checked);});
 $('gAll').addEventListener('click',()=>GROUPS.forEach((g,i)=>setGroup(i,true)));
 $('gNone').addEventListener('click',()=>GROUPS.forEach((g,i)=>setGroup(i,false)));
