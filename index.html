@@ -26,7 +26,7 @@ h1{font-family:var(--f-display);font-stretch:72%;font-weight:800;font-size:clamp
 .ph:first-child{border-top:0;padding-top:0;margin-top:0}
 .stage{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .fig{position:relative;min-height:560px;height:72vh;background:#05070b;color:#e2e8ed}
-.fig canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+.fig canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:default}
 .lbl{position:absolute;font:600 10.5px var(--f-body);text-transform:uppercase;letter-spacing:.07em;color:#e2e8ed;background:rgba(5,7,11,.7);padding:3px 7px;border-radius:4px;pointer-events:none;white-space:nowrap;transform:translate(8px,-50%)}
 .clock,.hud{position:absolute;top:12px;text-shadow:0 1px 3px #000,0 0 8px #000;padding:8px 12px;pointer-events:none}
 .clock{right:12px;text-align:right;display:flex;flex-direction:column}
@@ -78,9 +78,10 @@ td.n{text-align:right;font:12px var(--f-mono);font-variant-numeric:tabular-nums;
 input[type=search]{font:14px var(--f-mono);letter-spacing:.1em;color:var(--ink);background:var(--ctl);border:1px solid var(--line);border-radius:6px;min-height:40px;padding:0 10px;width:100%}
 .note{font:11.5px/1.55 var(--f-mono);color:var(--mut)}
 #hs text{font-family:var(--f-mono)}
+@media(min-width:901px){body{padding-left:max(24px,4vw,env(safe-area-inset-left,0px));padding-right:max(24px,4vw,env(safe-area-inset-right,0px))}.top,.stage,.blocks{max-width:1480px;margin-inline:auto}.stage,.blocks{border-left:1px solid var(--line);border-right:1px solid var(--line)}}
 @media(max-width:900px){.fig{height:62vh;min-height:420px}.gwrap{grid-template-columns:minmax(0,1fr)}}
-.fab{display:none;position:absolute;right:12px;bottom:12px;background:var(--acc);border-color:var(--acc);color:#1a0d05;min-height:44px;padding:0 16px;box-shadow:0 2px 10px rgba(0,0,0,.5)}
-@media(max-width:900px){.fab{display:block}.fig{height:62svh;min-height:360px;touch-action:none}}
+.fab{display:block;position:absolute;right:12px;bottom:12px;background:var(--acc);border-color:var(--acc);color:#1a0d05;min-height:44px;padding:0 16px;box-shadow:0 2px 10px rgba(0,0,0,.5)}
+@media(max-width:900px){.fig{height:62svh;min-height:360px;touch-action:none}}
 @media(max-width:600px){
 .pbs{flex-basis:100%}.pbs select{flex:1}
 .top{padding:14px 14px 12px}.top p{font-size:15px}
@@ -305,6 +306,14 @@ const camera=new THREE.PerspectiveCamera(40,1,0.01,200);
 camera.position.set(...P_.geo(21,-105,4.51)); // default view: North America centred, Johnston Island (Starfish site) on the western limb
 const controls=new THREE.OrbitControls(camera,cv);
 controls.enableDamping=true;controls.minDistance=1.4;controls.maxDistance=30;
+// Rotate only when the drag starts on the Earth: clicking empty space does nothing (wheel and pinch zoom still work)
+const grabRay=new THREE.Raycaster(),grabNdc=new THREE.Vector2(),grabSphere=new THREE.Sphere(new THREE.Vector3(),1.02);
+const onEarth=(x,y)=>{const r=cv.getBoundingClientRect();grabNdc.set((x-r.left)/r.width*2-1,-(y-r.top)/r.height*2+1);grabRay.setFromCamera(grabNdc,camera);return grabRay.ray.intersectsSphere(grabSphere);};
+fig.addEventListener('pointerdown',e=>{if(e.pointerType==='touch')return;const hit=onEarth(e.clientX,e.clientY);controls.enabled=hit;if(hit)cv.style.cursor='grabbing';},true);
+fig.addEventListener('touchstart',e=>{controls.enabled=e.touches.length>1||onEarth(e.touches[0].clientX,e.touches[0].clientY);},{capture:true,passive:true});
+window.addEventListener('pointerup',e=>{if(e.pointerType!=='touch'){controls.enabled=true;cv.style.cursor=onEarth(e.clientX,e.clientY)?'grab':'default';}});
+window.addEventListener('touchend',e=>{if(!e.touches.length)controls.enabled=true;});
+cv.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'&&!e.buttons)cv.style.cursor=onEarth(e.clientX,e.clientY)?'grab':'default';});
 scene.add(new THREE.AmbientLight(0xffffff,0.55));
 const sun=new THREE.DirectionalLight(0xffffff,0.8);sun.position.set(5,2,3);scene.add(sun);
 const earth=new THREE.Group();scene.add(earth);
