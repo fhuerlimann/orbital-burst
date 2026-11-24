@@ -32,7 +32,7 @@ python3 -m http.server 8000
 | File | Contents |
 |---|---|
 | `index.html` | The whole application: HTML, CSS and JavaScript |
-| `sats.json` | Active Earth-orbiting satellites: name, NORAD ID, owner, group, perigee (km), apogee (km), inclination (°) |
+| `sats.json` | Active Earth-orbiting satellites in compact column form: name, NORAD ID, owner, group, perigee (km), apogee (km), inclination (hundredths of a degree) |
 | `data/satcat.csv` | CelesTrak SATCAT export that sats.json is built from |
 | `tools/build_sats.py` | Rebuilds sats.json from a SATCAT CSV (`python3 tools/build_sats.py`) |
 | `tools/validate.js` | Headless physics checks (`node tools/validate.js all`) |

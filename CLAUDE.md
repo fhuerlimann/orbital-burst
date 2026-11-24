@@ -20,7 +20,7 @@ python3 tools/build_sats.py      # rebuild sats.json from data/satcat.csv
 | Path | Purpose |
 |---|---|
 | `index.html` | **The entire app**: HTML, CSS and two inline scripts. No build step, no framework. |
-| `sats.json` | 17,405 active satellites: `[name, norad_id, owner, group, perigee_km, apogee_km, incl_deg]`, one per line |
+| `sats.json` | 17,405 active satellites in compact column form (`format: "sats-v2"`, 671 KB, about 123 KB gzipped): `groups` = [[group, count]…] in storage order, `owners` lookup, then one array each for `name`, `id`, `owner` (index), `per`, `apo` (km) and `inc` (hundredths of a degree). Rows are sorted by group, perigee, apogee. `makeSatsFromData` also still accepts the old array-of-rows form (validate.js uses it for Telstar). `index.html` preloads it with `<link rel="preload" as="fetch" crossorigin>` so it downloads in parallel with three.js. |
 | `data/satcat.csv` | CelesTrak SATCAT export (latest launch 2026‑11‑20), the source of sats.json |
 | `tools/build_sats.py` | SATCAT → sats.json, including the group classification. Reproduces the current file exactly. |
 | `tools/physics.js` | Loads the physics core out of index.html into Node |

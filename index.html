@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>One nuclear blast vs. 17,000 satellites</title>
+<link rel="preload" href="sats.json" as="fetch" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -269,7 +270,8 @@ return Object.assign(o,{a,r:a/RE,e,inc,n,raan:o.raan!=null?o.raan:Math.random()*
 function makeSats(){const S=[];
 const shell=(g,alt,inc,planes,per,f)=>{for(let p=0;p<planes;p++)for(let s=0;s<per;s++)S.push(satFromOrbit({name:g+' '+(S.length+1),g,per:alt,apo:alt,inc,raan:TAU*p/planes,argp:0,M0:TAU*s/per+TAU*p*f/(planes*per)}));};
 shell('Starlink',550,53,24,9,1);shell('Other LEO',560,97.6,12,6,1);shell('Navigation (GPS, GLONASS, Galileo, BeiDou)',20200,55,6,4,1);return S;}
-function makeSatsFromData(rows){return rows.map(r=>satFromOrbit({name:r[0],id:r[1],own:r[2],g:r[3],per:r[4],apo:r[5],inc:r[6]}));}
+function makeSatsFromData(d){if(Array.isArray(d))return d.map(r=>satFromOrbit({name:r[0],id:r[1],own:r[2],g:r[3],per:r[4],apo:r[5],inc:r[6]}));
+const S=[];let i=0;for(const [g,n] of d.groups)for(let k=0;k<n;k++,i++)S.push(satFromOrbit({name:d.name[i],id:String(d.id[i]),own:d.owners[d.owner[i]],g,per:d.per[i],apo:d.apo[i],inc:d.inc[i]/100}));return S;}
 function satPos(s,t){const M=s.M0+s.n*t;let E=M;for(let i=0;i<(s.e>0.1?10:3);i++)E-=(E-s.e*Math.sin(E)-M)/(1-s.e*Math.cos(E));
 const x=s.r*(Math.cos(E)-s.e),y=s.r*Math.sqrt(1-s.e*s.e)*Math.sin(E);
 const W=s.raan+s.dRaan*t,w=s.argp+s.dArgp*t,cW=Math.cos(W),sW=Math.sin(W),cw=Math.cos(w),sw=Math.sin(w),ci=Math.cos(s.inc),si=Math.sin(s.inc);
